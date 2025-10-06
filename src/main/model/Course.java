@@ -14,30 +14,41 @@ public class Course {
     private String category;                 // the course's category (core or elective)
     private List<Assignment> assignments;    // list of assignments for this course
 
+    // EFFECTS: creates a Course with given courseCode, credits, category,
+    // and an empty list of assignments 
     public Course(String courseCode, int credits, String category) {
         // stub
     }
 
+    // MODIFIES: this
+    // EFFECTS: adds the assignment a to the list of assignments for this course
     public void addAssignment(Assignment a) {
         // stub
     }
 
+    // EFFECTS: returns the course code of this course
     public String getCourseCode() {
         return "";
     }
 
+    // EFFECTS: returns the number of credits for this course 
     public int getCredits() {
         return 0;
     }
 
+    // EFFECTS: returns the category of this course
     public String getCategory() {
         return "";
     }
 
+    // EFFECTS: returns a list of assignments in this course
+    // if there are no assignments, returns nothing
     public List<Assignment> getAssignments() {
         return null;
     }
 
+    // EFFECTS: returns weighted average of all assignments in this course,
+    // or 0.0 if there are no assignments
     public double getCourseAverage() {
         return 0.0;
     }
