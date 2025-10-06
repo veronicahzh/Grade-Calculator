@@ -10,8 +10,9 @@ import java.util.List;
 public class Term {
     private String termName;        // the name of the term
     private List<Course> courses;   // the list of courses in this term
+    private int year;
 
-    public Term(String termName) {
+    public Term(String termName, int year) {
         // stub
     }
 

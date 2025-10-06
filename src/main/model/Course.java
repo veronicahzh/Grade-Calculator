@@ -9,12 +9,12 @@ import java.util.List;
  */
 
 public class Course {
-    private String courseCode;              // the code of the course
-    private int credits;                    // number of credits for the course
-    private Category category;              // the course's category (core or elective)
-    private List<Assignment> assignments;  // list of assignments for this course
+    private String courseCode;               // the code of the course
+    private int credits;                     // number of credits for the course
+    private String category;                 // the course's category (core or elective)
+    private List<Assignment> assignments;    // list of assignments for this course
 
-    public Course(String courseCode, int credits, Category category) {
+    public Course(String courseCode, int credits, String category) {
         // stub
     }
 
@@ -30,8 +30,8 @@ public class Course {
         return 0;
     }
 
-    public Category getCategory() {
-        return null;
+    public String getCategory() {
+        return "";
     }
 
     public List<Assignment> getAssignments() {
