@@ -11,12 +11,12 @@ import java.util.List;
 public class Course {
     private String courseCode;               // the code of the course
     private int credits;                     // number of credits for the course
-    private String category;                 // the course's category (core or elective)
+    private boolean isCore;                  // determines if course is core or elective
     private List<Assignment> assignments;    // list of assignments for this course
 
     // EFFECTS: creates a Course with given courseCode, credits, category,
     // and an empty list of assignments 
-    public Course(String courseCode, int credits, String category) {
+    public Course(String courseCode, int credits, boolean isCore) {
         // stub
     }
 
@@ -37,8 +37,18 @@ public class Course {
     }
 
     // EFFECTS: returns the category of this course
-    public String getCategory() {
+    public String getCourseType() {
         return "";
+    }
+
+    // EFFECTS: returns the level of this course
+    public int getCourseLevel() {
+        return 0;
+    }
+
+    // EFFECTS: returns true if this course is a core course
+    public boolean checkIsCore() {
+        return false;
     }
 
     // EFFECTS: returns a list of assignments in this course
