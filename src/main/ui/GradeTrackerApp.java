@@ -304,7 +304,13 @@ public class GradeTrackerApp {
             System.out.println((i + 1) + ": " + terms.get(i).getTermName());
         }
 
-        int termChoice = Integer.parseInt(input.nextLine());
+        int termChoice = Integer.parseInt(input.nextLine()) - 1;
+
+        if (termChoice < 0 || termChoice >= terms.size()) {
+            System.out.println("Invalid term selection.");
+            return;
+        }
+
         Term selectedTerm = terms.get(termChoice);
 
         if (selectedTerm.getCourses().isEmpty()) {
@@ -318,6 +324,12 @@ public class GradeTrackerApp {
         }
 
         int courseChoice = Integer.parseInt(input.nextLine()) - 1;
+
+        if (courseChoice < 0 || courseChoice >= selectedTerm.getCourses().size()) {
+            System.out.println("Invalid course selection.");
+            return;
+        }
+        
         Course selectedCourse = selectedTerm.getCourses().get(courseChoice);
 
         if (selectedCourse.getAssignments().isEmpty()) {
