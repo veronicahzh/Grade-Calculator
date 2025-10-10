@@ -76,9 +76,9 @@ public class CourseTest {
     @Test
     public void testGetCourseAverageZeroWeights() {
         Assignment assignmentZero = new Assignment("A1", 0.0, 85.0);
-        Assignment assignmnentZeroTwo = new Assignment("A2", 0.0, 70.0);
+        Assignment assignmentZeroTwo = new Assignment("A2", 0.0, 70.0);
         c1.addAssignment(assignmentZero);
-        c1.addAssignment(assignmnentZeroTwo);
+        c1.addAssignment(assignmentZeroTwo);
         assertEquals(0.0, c1.getCourseAverage());
     }
 }
