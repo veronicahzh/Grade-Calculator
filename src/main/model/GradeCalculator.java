@@ -19,8 +19,13 @@ public class GradeCalculator {
     }
 
     // REQUIRES: 0 <= avg <= 100
-    // EFFECTS: returns corresponding GPA based on UBC scale
-    public static double convertToGPA(double avg) {
+    // EFFECTS: returns corresponding letter grade based on UBC grading scale
+    public static String convertToLetterGrade(double avg) {
+        return "";
+    }
+
+    // EFFECTS: converts letter grade into GPA based on UBC grading scale
+    public static double letterToGPA(String letter) {
         return 0.0;
     }
     
