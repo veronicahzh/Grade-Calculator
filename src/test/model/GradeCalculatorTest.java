@@ -78,7 +78,7 @@ public class GradeCalculatorTest {
     }
 
     @Test
-    public void testLetterToGPAInvalidLetter() {
+    public void testLetterToGpaInvalidLetter() {
         assertEquals(0.0, GradeCalculator.letterToGPA("Z"));
     }
 }

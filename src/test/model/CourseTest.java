@@ -75,10 +75,10 @@ public class CourseTest {
 
     @Test
     public void testGetCourseAverageZeroWeights() {
-        Assignment aZero1 = new Assignment("A1", 0.0, 85.0);
-        Assignment aZero2 = new Assignment("A2", 0.0, 70.0);
-        c1.addAssignment(aZero1);
-        c1.addAssignment(aZero2);
+        Assignment assignmentZero = new Assignment("A1", 0.0, 85.0);
+        Assignment assignmnentZeroTwo = new Assignment("A2", 0.0, 70.0);
+        c1.addAssignment(assignmentZero);
+        c1.addAssignment(assignmnentZeroTwo);
         assertEquals(0.0, c1.getCourseAverage());
     }
 }
