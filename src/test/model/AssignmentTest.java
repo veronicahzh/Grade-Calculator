@@ -6,9 +6,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class AssignmentTest {
-    Assignment a1;
-    Assignment a2;
-    Assignment a3;
+    private Assignment a1;
+    private Assignment a2;
+    private Assignment a3;
 
     @BeforeEach
     void runBefore() {

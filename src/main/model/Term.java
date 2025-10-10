@@ -29,6 +29,11 @@ public class Term {
         return "";
     }
 
+    // EFFECTS: returns the year of this term
+    public int getTermYear() {
+        return 0;
+    }
+
     // EFFECTS: returns a list of courses in this term
     // if there are no courses, return nothing
     public List<Course> getCourses() {

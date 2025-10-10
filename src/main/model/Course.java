@@ -31,7 +31,7 @@ public class Course {
         return "";
     }
 
-    // EFFECTS: returns the number of credits for this course 
+    // EFFECTS: returns the number of credits for this course
     public int getCredits() {
         return 0;
     }
