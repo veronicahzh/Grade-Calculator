@@ -76,4 +76,11 @@ public class TermTest {
         assertEquals(((c1Weight + c2Weight) / (4.0 + 3.0)), t1.getTermAverage());
     }
 
+    @Test
+    public void testGetTermAverageWithZeroCreditCourse() {
+        Course zeroCredit = new Course("MATH_100", 0, true);
+        zeroCredit.addAssignment(new Assignment("Hw", 0.5, 90.0));
+        t1.addCourse(zeroCredit);
+        assertEquals(0.0, t1.getTermAverage());
+    }
 }

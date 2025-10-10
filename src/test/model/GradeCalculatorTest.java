@@ -69,4 +69,16 @@ public class GradeCalculatorTest {
         List<Double> empty = List.of();
         assertEquals(0.0, GradeCalculator.calculateAverageGPA(empty));
     }
+
+    @Test
+    public void testCalculateWeightedAverageEmptyLists() {
+        List<Double> emptyGrades = List.of();
+        List<Double> emptyWeights = List.of();
+        assertEquals(0.0, GradeCalculator.calculateWeightedAverage(emptyGrades, emptyWeights));
+    }
+
+    @Test
+    public void testLetterToGPAInvalidLetter() {
+        assertEquals(0.0, GradeCalculator.letterToGPA("Z"));
+    }
 }

@@ -67,4 +67,18 @@ public class CourseTest {
         double c1Avg = (0.2 * 90 + 0.5 * 75.5) / (0.2 + 0.5);
         assertEquals(c1Avg, c1.getCourseAverage());
     }
+
+    @Test
+    public void testGetCourseAverageEmptyCourse() {
+        assertEquals(0.0, c1.getCourseAverage());
+    }
+
+    @Test
+    public void testGetCourseAverageZeroWeights() {
+        Assignment aZero1 = new Assignment("A1", 0.0, 85.0);
+        Assignment aZero2 = new Assignment("A2", 0.0, 70.0);
+        c1.addAssignment(aZero1);
+        c1.addAssignment(aZero2);
+        assertEquals(0.0, c1.getCourseAverage());
+    }
 }
