@@ -1,5 +1,6 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -14,52 +15,72 @@ public class Course {
     private boolean isCore;                  // determines if course is core or elective
     private List<Assignment> assignments;    // list of assignments for this course
 
+    // REQUIRES: courseCode is in format "XXXX_000" where XXX are letters and 000 are digits
     // EFFECTS: creates a Course with given courseCode, credits, category,
-    // and an empty list of assignments 
+    // and an empty list of assignments
     public Course(String courseCode, int credits, boolean isCore) {
-        // stub
+        this.courseCode = courseCode;
+        this.credits = credits;
+        this.isCore = isCore;
+        this.assignments = new ArrayList<>();
     }
 
     // MODIFIES: this
     // EFFECTS: adds the assignment a to the list of assignments for this course
     public void addAssignment(Assignment a) {
-        // stub
+        assignments.add(a);
     }
 
     // EFFECTS: returns the course code of this course
     public String getCourseCode() {
-        return "";
+        return courseCode;
     }
 
     // EFFECTS: returns the number of credits for this course
     public int getCredits() {
-        return 0;
+        return credits;
     }
 
-    // EFFECTS: returns the category of this course
+    // EFFECTS: returns the subject portion of this course's code
     public String getCourseType() {
-        return "";
+        return courseCode.split("_")[0];
     }
 
-    // EFFECTS: returns the level of this course
+    // EFFECTS: returns the course level rounded to the nearest hundred
     public int getCourseLevel() {
-        return 0;
+        int level = Integer.parseInt(courseCode.split("_")[1]);
+        return (level / 100) * 100;
     }
 
     // EFFECTS: returns true if this course is a core course
     public boolean checkIsCore() {
-        return false;
+        return isCore;
     }
 
-    // EFFECTS: returns a list of assignments in this course
-    // if there are no assignments, returns nothing
+    // EFFECTS: returns a list of assignments for this course (empty if none)
     public List<Assignment> getAssignments() {
-        return null;
+        return assignments;
     }
 
     // EFFECTS: returns weighted average of all assignments in this course,
     // or 0.0 if there are no assignments
     public double getCourseAverage() {
-        return 0.0;
+        if (assignments.isEmpty()) {
+            return 0.0;
+        }
+
+        double totalWeighted = 0;
+        double totalWeight = 0;
+
+        for (Assignment a : assignments) {
+            totalWeighted += a.getWeightedContribution();
+            totalWeight += a.getWeight();
+        }
+
+        if (totalWeight == 0) {
+            return 0.0;
+        }
+
+        return totalWeighted / totalWeight;
     }
 }

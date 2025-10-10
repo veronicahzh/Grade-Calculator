@@ -16,26 +16,28 @@ public class Assignment {
     */
 
     public Assignment(String name, double weight, double grade) {
-        // stub
+        this.name = name;
+        this.weight = weight;
+        this.grade = grade;
     }
 
     // EFFECTS: returns the name of this assignment
     public String getName() {
-        return "";
+        return name;
     }
 
     // EFFECTS: returns the weight of this assignment (between 0 and 1)
     public double getWeight() {
-        return 0.0;
+        return weight;
     }
 
     // EFFECTS: returns the grade received for this assignment (0 to 100)
     public double getGrade() {
-        return 0.0;
+        return grade;
     }
 
     // EFFECTS: returns grade * weight
     public double getWeightedContribution() {
-        return 0.0;
+        return grade * weight;
     }
 }
