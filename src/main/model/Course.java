@@ -15,7 +15,7 @@ public class Course {
     private boolean isCore;                  // determines if course is core or elective
     private List<Assignment> assignments;    // list of assignments for this course
 
-    // REQUIRES: courseCode is in format "XXXX_000" where XXX are letters and 000 are digits
+    // REQUIRES: courseCode is in format "XXXX_000" where XXXX are letters and 000 are digits
     // EFFECTS: creates a Course with given courseCode, credits, category,
     // and an empty list of assignments
     public Course(String courseCode, int credits, boolean isCore) {
