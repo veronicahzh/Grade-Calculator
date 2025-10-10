@@ -13,7 +13,7 @@ public class AssignmentTest {
     @BeforeEach
     void runBefore() {
         a1 = new Assignment("Homework 1", 0.2, 90.0);
-        a2 = new Assignment("Miderm", 0.3, 0.0);
+        a2 = new Assignment("Midterm", 0.3, 0.0);
         a3 = new Assignment("Final", 0.5, 75.5);
     }
 

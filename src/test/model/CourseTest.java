@@ -20,7 +20,7 @@ public class CourseTest {
         c2 = new Course("ECON_101", 3, false);
 
         a1 = new Assignment("Homework 1", 0.2, 90.0);
-        a2 = new Assignment("Miderm", 0.3, 0.0);
+        a2 = new Assignment("Midterm", 0.3, 0.0);
         a3 = new Assignment("Final", 0.5, 75.5);
     }
     
@@ -64,7 +64,7 @@ public class CourseTest {
     public void testCourseAverageWithMissingWeights() {
         c1.addAssignment(a1);
         c1.addAssignment(a3);
-        double c1Avg = (0.2 * 90 + 0.5 * 75.5)/(0.2 + 0.5);
+        double c1Avg = (0.2 * 90 + 0.5 * 75.5) / (0.2 + 0.5);
         assertEquals(c1Avg, c1.getCourseAverage());
     }
 }

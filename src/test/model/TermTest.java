@@ -23,7 +23,7 @@ public class TermTest {
         c2 = new Course("ECON_101", 3, false);
 
         a1 = new Assignment("Homework 1", 0.2, 90.0);
-        a2 = new Assignment("Miderm", 0.3, 0.0);
+        a2 = new Assignment("Midterm", 0.3, 0.0);
         a3 = new Assignment("Final", 0.5, 75.5);
     }
 
@@ -34,8 +34,8 @@ public class TermTest {
         assertTrue(t1.getCourses().isEmpty());
         assertEquals(0.0, t1.getTermAverage());
 
-        assertEquals("Summer Term 2", 2025);
-        assertEquals(2025, t1.getTermYear());
+        assertEquals("Summer Term 2", t2.getTermName());
+        assertEquals(2025, t2.getTermYear());
         assertTrue(t2.getCourses().isEmpty());
         assertEquals(0.0, t2.getTermAverage());
     }
@@ -70,10 +70,10 @@ public class TermTest {
         t1.addCourse(c2);
         c2.addAssignment(a1);
         c2.addAssignment(a3);
-        double c2Avg = (0.2 * 90 + 0.5 * 75.5)/(0.2 + 0.5);
-        double c1Weight = c1Avg * 4;
-        double c2Weight = c2Avg * 3;
-        assertEquals((c1Weight + c2Weight)/(4 + 3), t1.getTermAverage());
+        double c2Avg = (0.2 * 90 + 0.5 * 75.5) / (0.2 + 0.5);
+        double c1Weight = c1Avg * 4.0;
+        double c2Weight = c2Avg * 3.0;
+        assertEquals(((c1Weight + c2Weight) / (4.0 + 3.0)), t1.getTermAverage());
     }
 
 }
