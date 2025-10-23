@@ -31,3 +31,9 @@ As a user, I want to be able to view my performance in core classes versus elect
 
 - **Apply weightings and credits:**
 As a user, I want to be able to apply the given weightings for assignments, as well as the credits for classes, so that these factors are taken into account when calculating grades.
+
+- **Save grade tracker to file:**
+As a user, I want to have the option to save my entire grade tracker — including all terms, courses, and assignments — to a file so that I can access my progress later.
+
+- **Load grade tracker from file:**
+As a user, I want to have the option to load a previously saved grade tracker file so that I can continue tracking my grades from where I left off.

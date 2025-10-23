@@ -6,6 +6,8 @@ import java.util.Scanner;
 
 import model.*;
 
+import ca.ubc.cs.ExcludeFromJacocoGeneratedReport;
+
 /*
  * Represents the main entry point for the Grade Tracker application
  * Handles user interaction through a console-based interface
