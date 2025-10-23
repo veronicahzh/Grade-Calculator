@@ -1,11 +1,15 @@
 package model;
 
+import org.json.JSONObject;
+
+import persistence.Writable;
+
 /*
  * Represents a graded component of a course, such as an assignment,
  * quiz, test, or lab. Each assignment has a name, weight, and grade.
  */
 
-public class Assignment {
+public class Assignment implements Writable{
     private String name;    // name of the assignment
     private double weight;  // weight of this assignment
     private double grade;   // grade received on this assignment (%)
@@ -39,5 +43,14 @@ public class Assignment {
     // EFFECTS: returns grade * weight
     public double getWeightedContribution() {
         return grade * weight;
+    }
+
+    @Override
+    public JSONObject toJson() {
+        JSONObject json = new JSONObject();
+        json.put("name", name);
+        json.put("weight", weight);
+        json.put("grade", grade);
+        return json;
     }
 }

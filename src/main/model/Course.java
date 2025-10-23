@@ -3,13 +3,18 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import persistence.Writable;
+
 /*
  * Represents a single course taken by a student during a term.
  * Each course has a course code, number of credits, a category,
  * and a list of assignments associated with it.
  */
 
-public class Course {
+public class Course implements Writable {
     private String courseCode;               // the code of the course
     private int credits;                     // number of credits for the course
     private boolean isCore;                  // determines if course is core or elective
@@ -82,5 +87,20 @@ public class Course {
         }
 
         return totalWeighted / totalWeight;
+    }
+
+    @Override
+    public JSONObject toJson() {
+        JSONObject json = new JSONObject();
+        json.put("courseCode", courseCode);
+        json.put("credits", credits);
+        json.put("isCore", isCore);
+
+        JSONArray jsonArray = new JSONArray();
+        for (Assignment a : assignments) {
+            jsonArray.put(a.toJson());
+        }
+        json.put("assignments", jsonArray);
+        return json;
     }
 }

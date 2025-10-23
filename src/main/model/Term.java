@@ -3,12 +3,17 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import persistence.Writable;
+
 /*
  * Represents a school term within an academic year.
  * Each Term has a name (e.g., "Term 1", "Winter 2025") and a list of Courses
  */
 
-public class Term {
+public class Term implements Writable {
     private String termName;        // the name of the term
     private List<Course> courses;   // the list of courses in this term
     private int year;
@@ -64,5 +69,18 @@ public class Term {
         }
 
         return totalWeighted / totalCredits;
+    }
+
+    public JSONObject toJson() {
+        JSONObject json = new JSONObject();
+        json.put("termName", termName);
+        json.put("year", year);
+
+        JSONArray jsonArray = new JSONArray();
+        for (Course c : courses) {
+            jsonArray.put(c.toJson());
+        }
+        json.put("courses", jsonArray);
+        return json;
     }
 }
