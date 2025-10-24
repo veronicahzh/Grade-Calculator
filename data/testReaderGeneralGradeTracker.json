@@ -1,0 +1,27 @@
+{
+    "terms": [
+        {
+            "termName": "Term 1",
+            "year": 2025,
+            "courses": [
+                {
+                    "courseCode": "CPSC_210",
+                    "credits": 4,
+                    "isCore": true,
+                    "assignments": [
+                        { "name": "A1", "weight":0.10, "grade": 85.0},
+                        { "name": "Midterm", "weight": 0.25, "grade": 78.5}
+                    ]
+                },
+                {
+                    "courseCode": "ECON_101",
+                    "credits": 3,
+                    "isCore": false,
+                    "assignments": [
+                        { "name": "Quiz 1", "weight": 0.05, "grade": 100.0}
+                    ]
+                }
+            ]
+        }
+    ]
+}
