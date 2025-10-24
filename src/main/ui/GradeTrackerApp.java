@@ -1,11 +1,14 @@
 package ui;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 import model.*;
-
+import persistence.JsonReader;
+import persistence.JsonWriter;
 import ca.ubc.cs.ExcludeFromJacocoGeneratedReport;
 
 /*
@@ -16,6 +19,7 @@ import ca.ubc.cs.ExcludeFromJacocoGeneratedReport;
 public class GradeTrackerApp {
     private Scanner input;
     private List<Term> terms;
+    private static final String DATA_FILE = "./data/my-grade-tracker.json";
 
     public GradeTrackerApp() {
         input = new Scanner(System.in);
@@ -51,6 +55,12 @@ public class GradeTrackerApp {
                     isRunning = false;
                     System.out.println("Goodbye!");
                     break;
+                case "7": 
+                    saveToFile();
+                    break;
+                case "8":
+                    loadFromFile();
+                    break;
                 default: 
                     System.out.println("Invalid selection.");
                     break;
@@ -68,6 +78,8 @@ public class GradeTrackerApp {
         System.out.println("4 --> View averages");
         System.out.println("5 --> View items");
         System.out.println("6 --> Quit");
+        System.out.println("7 --> Save to file");
+        System.out.println("8 --> Load from file");
         System.out.println("Select option: ");
     }
 
@@ -343,5 +355,59 @@ public class GradeTrackerApp {
         for (Assignment a : selectedCourse.getAssignments()) {
             System.out.println("- " + a.getName() + " (" + a.getWeight() + " weight, " + a.getGrade() + "%)");
         }
+    }
+
+    // EFFECTS: ensures ./data directory exists (so writer can create the file)
+    private void ensureDataDir() {
+        try {
+            Path dir = Path.of("./data");
+            if (!Files.exists(dir)) {
+                Files.createDirectories(dir);
+            }
+        } catch (Exception e) {
+            System.out.println("Warning: couldn't ensure ./data directory: " + e.getMessage());
+        }
+    }
+
+    // EFFECTS: writes current terms to DATA_FILE
+    private void saveToFile() {
+        ensureDataDir();
+        try {
+            JsonWriter writer = new JsonWriter(DATA_FILE);
+            writer.open();
+            writer.write(terms);
+            writer.close();
+            System.out.println("Saved to " + DATA_FILE);
+        } catch (Exception e) {
+            System.out.println("Save failed: " + e.getMessage());
+        }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: loads terms from DATA_FILE
+    private void loadFromFile() {
+        try {
+            JsonReader reader = new JsonReader(DATA_FILE);
+            List<Term> loaded = reader.readTerms();
+            this.terms = loaded;
+            printLoadSummary();
+        } catch (Exception e) {
+            System.out.println("Load failed: " + e.getMessage());
+        }
+    }
+
+    // EFFECTS: prints a brief summary of the loaded state
+    private void printLoadSummary() {
+        int termCount = terms.size();
+        int courseCount = 0;
+        int assignmentCount = 0;
+        for (Term t : terms) {
+            courseCount += t.getCourses().size();
+            for (Course c : t.getCourses()) {
+                assignmentCount += c.getAssignments().size();
+            }
+        }
+        System.out.print("Loaded " + termCount + " term(s), ");
+        System.out.print(courseCount + " course(s), " + assignmentCount + " assignment(s).");
     }
 }

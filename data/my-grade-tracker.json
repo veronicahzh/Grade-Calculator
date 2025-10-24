@@ -1,0 +1,29 @@
+{"terms": [{
+  "courses": [
+    {
+      "assignments": [
+        {
+          "grade": 87.6,
+          "name": "mt 1",
+          "weight": 0.5
+        },
+        {
+          "grade": 100,
+          "name": "hw 1",
+          "weight": 0.02
+        }
+      ],
+      "credits": 4,
+      "courseCode": "CPSC_210",
+      "isCore": true
+    },
+    {
+      "assignments": [],
+      "credits": 3,
+      "courseCode": "ECON_101",
+      "isCore": false
+    }
+  ],
+  "year": 2025,
+  "termName": "term 1"
+}]}
