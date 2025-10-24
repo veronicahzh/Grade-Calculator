@@ -104,4 +104,15 @@ public class JsonReaderTest extends JsonTest {
             fail("Couldn't read from file");
         }
     }
+
+    @Test
+    void testReaderNoTermsKey() {
+        JsonReader reader = new JsonReader("./data/testReaderNoTermsKey.json");
+        try {
+            List<Term> terms = reader.readTerms();
+            assertTrue(terms.isEmpty());
+        } catch (IOException e) {
+            fail("Couldn't read from a file");
+        }
+    }
 }

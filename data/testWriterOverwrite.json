@@ -1,0 +1,14 @@
+{"terms": [{
+  "courses": [{
+    "assignments": [{
+      "grade": 10,
+      "name": "Quiz 1",
+      "weight": 0.05
+    }],
+    "credits": 3,
+    "courseCode": "STAT_200",
+    "isCore": false
+  }],
+  "year": 2026,
+  "termName": "Term 1"
+}]}
