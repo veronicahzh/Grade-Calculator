@@ -108,24 +108,12 @@ public class JsonWriterTest extends JsonTest {
 
     @Test
     void testWriterOverwriteExistingFile() {
+        String path = "./data/testWriterOverwrite.json";
         try {
-            JsonWriter writer = new JsonWriter("./data/testWriterOverwrite.json");
-            writer.open();
-            writer.write(List.of());
-            writer.close();
+            writeTerms(path, List.of());
+            writeTerms(path, List.of(sampleTerm()));
 
-            Term t = new Term("Term 1", 2026);
-            Course c = new Course("STAT_200", 3, false);
-            c.addAssignment(new Assignment("Quiz 1", 0.05, 10.0));
-            t.addCourse(c);
-
-            JsonWriter writer2 = new JsonWriter("./data/testWriterOverwrite.json");
-            writer2.open();
-            writer2.write(List.of(t));
-            writer2.close();
-
-            JsonReader r = new JsonReader("./data/testWriterOverwrite.json");
-            List<Term> loaded = r.readTerms();
+            List<Term> loaded = new JsonReader(path).readTerms();
             assertEquals(1, loaded.size());
             Term term = loaded.get(0);
             checkTerm("Term 1", 2026, 1, term);
@@ -135,5 +123,20 @@ public class JsonWriterTest extends JsonTest {
         } catch (IOException e) {
             fail("Exception should not have been thrown: " + e.getMessage());
         }
+    }
+
+    private void writeTerms(String path, List<Term> terms) throws IOException {
+        JsonWriter w = new JsonWriter(path);
+        w.open();
+        w.write(terms);
+        w.close();
+    }
+
+    private Term sampleTerm() {
+        Term t = new Term("Term 1", 2026); 
+        Course c = new Course("STAT_200", 3, false);
+        c.addAssignment(new Assignment("Quiz 1", 0.05, 10.0));
+        t.addCourse(c);
+        return t;
     }
 }

@@ -16,6 +16,7 @@ import ca.ubc.cs.ExcludeFromJacocoGeneratedReport;
  * Handles user interaction through a console-based interface
  */
 
+@ExcludeFromJacocoGeneratedReport
 public class GradeTrackerApp {
     private Scanner input;
     private List<Term> terms;
@@ -28,44 +29,59 @@ public class GradeTrackerApp {
     }
 
     // EFFECTS: runs the GradeTracker application
-    @SuppressWarnings("methodlength")
     private void runApp() {
         boolean isRunning = true;
-        while (isRunning) {
+        while (true) {
             displayMenu();
-            String command = input.nextLine().toLowerCase();
-
-            switch (command) {
-                case "1": 
-                    addTerm();
-                    break;
-                case "2": 
-                    addCourseToTerm();
-                    break;
-                case "3": 
-                    addAssignmentToCourse();
-                    break;
-                case "4": 
-                    viewAverages();
-                    break;
-                case "5": 
-                    viewItems();
-                    break;
-                case "6": 
-                    isRunning = false;
-                    System.out.println("Goodbye!");
-                    break;
-                case "7": 
-                    saveToFile();
-                    break;
-                case "8":
-                    loadFromFile();
-                    break;
-                default: 
-                    System.out.println("Invalid selection.");
-                    break;
+            String command = input.nextLine();
+            if (!processCommand(command)) {
+                break;
             }
         }
+    }
+
+
+    // EFFECTS: handles a single menu command; returns false to quit, true to continue
+    private boolean processCommand(String commandRaw) {
+        String c = commandRaw.trim().toLowerCase();
+        switch (c) {
+            case "1": 
+                return run(this::addTerm);
+            case "2": 
+                return run(this::addCourseToTerm);
+            case "3": 
+                return run(this::addAssignmentToCourse);
+            case "4": 
+                return run(this::viewAverages);
+            case "5": 
+                return run(this::viewItems);
+            case "6": 
+                return quit();
+            case "7": 
+                return run(this::saveToFile);
+            case "8": 
+                return run(this::loadFromFile);
+            default: 
+                return invalid();
+        }
+    }
+
+    // EFFECTS: runs the action and continues the app
+    private boolean run(Runnable action) {
+        action.run();
+        return true;
+    }
+
+    // EFFECTS: prints goodbye and stops the app
+    private boolean quit() {
+        System.out.println("Goodbye!");
+        return false;
+    }
+
+    // EFFECTS: prints invalid selection and continues the app
+    private boolean invalid() {
+        System.out.println("Invalid selection.");
+        return true;
     }
 
     // EFFECTS: prompts user with what action they would like to perform with
@@ -125,45 +141,83 @@ public class GradeTrackerApp {
 
     // MODIFIES: this
     // EFFECTS: lets user pick a term, then a course, then add an assignment to that course
-    @SuppressWarnings("methodlength")
     private void addAssignmentToCourse() {
         if (terms.isEmpty()) {
             System.out.println("No terms available. Please add a term first.");
             return;
         }
-        
-        System.out.println("Select a term:");
-        for (int i = 0; i < terms.size(); i++) {
-            System.out.println((i + 1) + ": " + terms.get(i).getTermName());
+
+        int termIndex = chooseTermIndex();
+        if (termIndex == -1) {
+            return;
         }
+        Term term = terms.get(termIndex);
 
-        int termChoice = Integer.parseInt(input.nextLine()) - 1;
-        Term selectedTerm = terms.get(termChoice);
-
-        if (selectedTerm.getCourses().isEmpty()) {
+        if (term.getCourses().isEmpty()) {
             System.out.println("No courses in this term. Please add a course first.");
             return;
         }
 
-        System.out.println("Select a course to add an assignment to: ");
-        for (int i = 0; i < selectedTerm.getCourses().size(); i++) {
-            System.out.println((i + 1) + ": " + selectedTerm.getCourses().get(i).getCourseCode());
+        int courseIndex = chooseCourseIndex(term);
+        if (courseIndex == -1) {
+            return;
         }
+        Course course = term.getCourses().get(courseIndex);
 
-        int courseChoice = Integer.parseInt(input.nextLine()) - 1;
-        Course selectedCourse = selectedTerm.getCourses().get(courseChoice);
+        Assignment a = promptAssignment();
+        course.addAssignment(a);
+        System.out.println("Added assignment \"" + a.getName() + "\" to " + course.getCourseCode());
+    }
 
+    // MODIFIES: this
+    // EFFECTS: prints a numbered list of terms; if valid, returns 0-based index, otherwise prints error
+    private int chooseTermIndex() {
+        System.out.println("Select a term:");
+        for (int i = 0; i < terms.size(); i++) {
+            System.out.println((i + 1) + ": " + terms.get(i).getTermName());
+        }
+        return readIndex(terms.size(), "Invalid term selection.");
+    }
+
+    // MODIFIES: this
+    // EFFECTS: print a numbered list of the term's courses; if valid, 
+    // returns 0-based index, otherwise prints error
+    private int chooseCourseIndex(Term term) {
+        System.out.println("Select a course to add an assignment to: ");
+        for (int i = 0; i < term.getCourses().size(); i++) {
+            System.out.println((i + 1) + ": " + term.getCourses().get(i).getCourseCode());
+        }
+        return readIndex(term.getCourses().size(), "Invalid course selection.");
+    }
+
+    // REQUIRES: max >= 0
+    // MODIFIES: this
+    // EFFECTS: reads a 1-based integer selection and converts it to a 0-based index
+    private int readIndex(int max, String onErrorMsg) {
+        try {
+            int index = Integer.parseInt(input.nextLine()) - 1;
+            if (index < 0 || index >= max) {
+                System.out.println(onErrorMsg);
+                return -1;
+            }
+            return index;
+        } catch (NumberFormatException e) {
+            System.out.println(onErrorMsg);
+            return -1;
+        }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: prompts for assignment name, weight, and grade,
+    // constructs and returns a new assignment with those values
+    private Assignment promptAssignment() {
         System.out.println("Enter assignment name: ");
         String name = input.nextLine();
         System.out.println("Enter assignment weight (0-1): ");
         double weight = Double.parseDouble(input.nextLine());
         System.out.println("Enter grade received (0-100): ");
         double grade = Double.parseDouble(input.nextLine());
-
-        Assignment a = new Assignment(name, weight, grade);
-        selectedCourse.addAssignment(a);
-
-        System.out.println("Added assignment \"" + name + "\" to " + selectedCourse.getCourseCode());
+        return new Assignment(name, weight, grade);
     }
 
     // EFFECTS: allows user to choose to view average by year or by category
@@ -306,53 +360,42 @@ public class GradeTrackerApp {
     }
 
     // EFFECTS: displays all assignments in a selected course within a chosen term
-    @SuppressWarnings("methodlength")
     private void viewAssignmentsInCourse() {
         if (terms.isEmpty()) {
             System.out.println("No terms available.");
             return;
         }
 
-        System.out.println("Select a term:");
-        for (int i = 0; i < terms.size(); i++) {
-            System.out.println((i + 1) + ": " + terms.get(i).getTermName());
-        }
-
-        int termChoice = Integer.parseInt(input.nextLine()) - 1;
-
-        if (termChoice < 0 || termChoice >= terms.size()) {
-            System.out.println("Invalid term selection.");
+        int termIndex = chooseTermIndex();
+        if (termIndex == -1) {
             return;
         }
 
-        Term selectedTerm = terms.get(termChoice);
-
-        if (selectedTerm.getCourses().isEmpty()) {
+        Term term = terms.get(termIndex);
+        if (term.getCourses().isEmpty()) {
             System.out.println("No courses in this term.");
             return;
         }
 
-        System.out.println("Select a course:");
-        for (int i = 0; i < selectedTerm.getCourses().size(); i++) {
-            System.out.println((i + 1) + ": " + selectedTerm.getCourses().get(i).getCourseCode());
-        }
-
-        int courseChoice = Integer.parseInt(input.nextLine()) - 1;
-
-        if (courseChoice < 0 || courseChoice >= selectedTerm.getCourses().size()) {
-            System.out.println("Invalid course selection.");
+        int courseIndex = chooseCourseIndex(term);
+        if (courseIndex == -1) {
             return;
         }
-        
-        Course selectedCourse = selectedTerm.getCourses().get(courseChoice);
 
-        if (selectedCourse.getAssignments().isEmpty()) {
+        Course course = term.getCourses().get(courseIndex);
+
+        if (course.getAssignments().isEmpty()) {
             System.out.println("No assignments in this course.");
             return;
         }
 
-        System.out.println("Assignments in " + selectedCourse.getCourseCode() + ":");
-        for (Assignment a : selectedCourse.getAssignments()) {
+        printAssignments(course);
+    }
+
+    // EFFECTS: prints all assignments for a course
+    private void printAssignments(Course course) {
+        System.out.println("Assignments in " + course.getCourseCode() + ":");
+        for (Assignment a : course.getAssignments()) {
             System.out.println("- " + a.getName() + " (" + a.getWeight() + " weight, " + a.getGrade() + "%)");
         }
     }
