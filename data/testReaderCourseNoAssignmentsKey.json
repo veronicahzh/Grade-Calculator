@@ -1,0 +1,11 @@
+{
+    "terms": [
+        {
+            "termName": "Term 3",
+            "year": 2026,
+            "courses": [
+                { "courseCode": "STAT_200", "credits": 3, "isCore": false }
+            ]
+        }
+    ]
+}

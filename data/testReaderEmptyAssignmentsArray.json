@@ -1,0 +1,16 @@
+{
+    "terms": [
+        {
+            "termName": "Term 4",
+            "year": 2026,
+            "courses": [
+                {
+                    "courseCode": "PHYS_101",
+                    "credits": 4,
+                    "isCore": false,
+                    "assignments": []
+                }
+            ]
+        }
+    ]
+}

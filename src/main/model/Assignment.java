@@ -9,7 +9,7 @@ import persistence.Writable;
  * quiz, test, or lab. Each assignment has a name, weight, and grade.
  */
 
-public class Assignment implements Writable{
+public class Assignment implements Writable {
     private String name;    // name of the assignment
     private double weight;  // weight of this assignment
     private double grade;   // grade received on this assignment (%)

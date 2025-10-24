@@ -51,4 +51,57 @@ public class JsonReaderTest extends JsonTest {
             fail("Couldn't read from file");
         }
     }
+
+    @Test
+    void testReaderEmptyGradeTracker() {
+        JsonReader reader = new JsonReader("./data/testReaderEmptyGradeTracker.json");
+        try {
+            List<Term> terms = reader.readTerms();
+            assertEquals(0, terms.size());
+        } catch (IOException e) {
+            fail("Couldn't read from file");
+        }
+    }
+
+    @Test
+    void testReaderNoCoursesKey() {
+        JsonReader reader = new JsonReader("./data/testReaderNoCoursesKey.json");
+        try {
+            List<Term> terms = reader.readTerms();
+            assertEquals(1, terms.size());
+            Term t = terms.get(0);
+            checkTerm("Term 2", 2026, 0, t);
+        } catch (IOException e) {
+            fail("Couldn't read from file");
+        }
+    }
+
+    @Test
+    void testReaderCourseNoAssignmentsKey() {
+        JsonReader reader = new JsonReader("./data/testReaderCourseNoAssignmentsKey.json");
+        try {
+            List<Term> terms = reader.readTerms();
+            assertEquals(1, terms.size());
+            Term t = terms.get(0);
+            assertEquals(1, t.getCourses().size());
+            Course c = t.getCourses().get(0);
+            checkCourse("STAT_200", 3, false, 0, c);
+        } catch (IOException e) {
+            fail("Couldn't read from file");
+        }
+    }
+
+    @Test
+    void testReaderEmptyAssignmentsArray() {
+        JsonReader reader = new JsonReader("./data/testReaderEmptyAssignmentsArray.json");
+        try {
+            List<Term> terms = reader.readTerms();
+            assertEquals(1, terms.size());
+            Term t = terms.get(0);
+            Course c = t.getCourses().get(0);
+            assertEquals(0, c.getAssignments().size());
+        } catch (IOException e) {
+            fail("Couldn't read from file");
+        }
+    }
 }
