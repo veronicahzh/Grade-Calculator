@@ -103,4 +103,9 @@ public class Course implements Writable {
         json.put("assignments", jsonArray);
         return json;
     }
+
+    @Override
+    public String toString() {
+        return courseCode + " (" + credits + " credits) ," + (isCore ? "Core" : "Elective") + ")";
+    }
 }
