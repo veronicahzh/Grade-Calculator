@@ -31,7 +31,7 @@ public class GradeTrackerApp {
     // EFFECTS: runs the GradeTracker application
     private void runApp() {
         boolean isRunning = true;
-        while (true) {
+        while (isRunning) {
             displayMenu();
             String command = input.nextLine();
             if (!processCommand(command)) {
