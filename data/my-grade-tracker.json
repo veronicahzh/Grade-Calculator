@@ -1,18 +1,7 @@
 {"terms": [{
   "courses": [
     {
-      "assignments": [
-        {
-          "grade": 87.6,
-          "name": "mt 1",
-          "weight": 0.5
-        },
-        {
-          "grade": 100,
-          "name": "hw 1",
-          "weight": 0.02
-        }
-      ],
+      "assignments": [],
       "credits": 4,
       "courseCode": "CPSC_210",
       "isCore": true
@@ -25,5 +14,5 @@
     }
   ],
   "year": 2025,
-  "termName": "term 1"
+  "termName": "Term 1"
 }]}

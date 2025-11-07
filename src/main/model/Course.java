@@ -106,6 +106,6 @@ public class Course implements Writable {
 
     @Override
     public String toString() {
-        return courseCode + " (" + credits + " credits), " + (isCore ? "Core" : "Elective") + ")";
+        return courseCode + " (" + credits + " credits), " + (isCore ? "Core" : "Elective");
     }
 }

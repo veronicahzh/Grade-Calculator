@@ -2,6 +2,9 @@ package ui;
 
 import javax.swing.*;
 import java.awt.BorderLayout;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import static javax.swing.JOptionPane.*;
 
@@ -9,13 +12,17 @@ import ca.ubc.cs.ExcludeFromJacocoGeneratedReport;
 
 import model.Course;
 import model.Term;
+import persistence.JsonReader;
+import persistence.JsonWriter;
 
 // Represents the GUI for the Grade Tracker application
 @ExcludeFromJacocoGeneratedReport
 public class GradeTrackerUI extends JFrame {
+    private static final String DATA_FILE = "./data/my-grade-tracker.json";
     private List<Term> terms;
     private Term currentTerm;
 
+    private JLabel header;
     private DefaultListModel<Course> courseListModel;
     private JList<Course> courseList;
 
@@ -32,6 +39,7 @@ public class GradeTrackerUI extends JFrame {
         setLocationRelativeTo(null);
 
         initComponents();
+        initMenuBar();
 
         setVisible(true);
     }
@@ -41,7 +49,7 @@ public class GradeTrackerUI extends JFrame {
     private void initComponents() {
         setLayout(new BorderLayout());
 
-        JLabel header = new JLabel("Courses in " + currentTerm.getTermName() + " " + currentTerm.getTermYear());
+        header = new JLabel("Courses in " + currentTerm.getTermName() + " " + currentTerm.getTermYear());
         header.setHorizontalAlignment(SwingConstants.CENTER);
         add(header, BorderLayout.NORTH);
 
@@ -63,6 +71,25 @@ public class GradeTrackerUI extends JFrame {
         add(buttonPanel, BorderLayout.SOUTH);
 
         refreshCourseList();
+    }
+
+    // MODIFIES: this
+    // EFFECTS: initializes the menu bar with save/load items
+    private void initMenuBar() {
+        JMenuBar menuBar = new JMenuBar();
+        JMenu fileMenu = new JMenu("File");
+
+        JMenuItem saveItem = new JMenuItem("Save");
+        saveItem.addActionListener(e -> handleSave());
+        fileMenu.add(saveItem);
+
+        JMenuItem loadItem = new JMenuItem("Load");
+        loadItem.addActionListener(e -> handleLoad());
+        fileMenu.add(loadItem);
+
+        menuBar.add(fileMenu);
+        
+        setJMenuBar(menuBar);
     }
 
     // MODIFIES: this
@@ -116,6 +143,55 @@ public class GradeTrackerUI extends JFrame {
         }
     }
 
+        // MODIFIES: this
+    // EFFECTS: saves terms list to DATA_FILE
+    private void handleSave() {
+        ensureDataDir();
+        try {
+            JsonWriter writer = new JsonWriter(DATA_FILE);
+            writer.open();
+            writer.write(terms);
+            writer.close();
+            JOptionPane.showMessageDialog(this, "Data saved successfully.");
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Failed to save: " + e.getMessage());
+        }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: loads terms from DATA_FILE and updates currentTerm
+    private void handleLoad() {
+        try {
+            JsonReader reader = new JsonReader(DATA_FILE);
+            List<Term> loaded = reader.readTerms();
+            if (loaded.isEmpty()) {
+                showMessageDialog(this, "No terms found in file.");
+                return;
+            }
+
+            terms = loaded;
+            currentTerm = terms.get(0);
+            header.setText("Courses in " + currentTerm.getTermName() + " " + currentTerm.getTermYear());
+            refreshCourseList();
+
+            JOptionPane.showMessageDialog(this, "Loaded " + terms.size() + " terms from file." + " term(s).");
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Failed to load: " + e.getMessage());
+        }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: ensures that the data directory exists
+    private void ensureDataDir() {
+        try {
+            Path dir = Path.of("./data");
+            if (!Files.exists(dir)) {
+                Files.createDirectories(dir);
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Failed to create data directory: " + e.getMessage());
+        }
+    }
 
     // EFFECTS: starts the GradeTracker GUI
     public static void main(String[] args) {
