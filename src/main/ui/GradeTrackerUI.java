@@ -21,6 +21,7 @@ public class GradeTrackerUI extends JFrame {
     private static final String DATA_FILE = "./data/my-grade-tracker.json";
     private List<Term> terms;
     private Term currentTerm;
+    private JComboBox<Term> termSelector;
 
     private JLabel header;
     private DefaultListModel<Course> courseListModel;
@@ -49,9 +50,7 @@ public class GradeTrackerUI extends JFrame {
     private void initComponents() {
         setLayout(new BorderLayout());
 
-        header = new JLabel("Courses in " + currentTerm.getTermName() + " " + currentTerm.getTermYear());
-        header.setHorizontalAlignment(SwingConstants.CENTER);
-        add(header, BorderLayout.NORTH);
+        add(createTopPanel(), BorderLayout.NORTH);
 
         courseListModel = new DefaultListModel<>();
         courseList = new JList<>(courseListModel);
@@ -62,6 +61,33 @@ public class GradeTrackerUI extends JFrame {
         add(createButtonPanel(), BorderLayout.SOUTH);
 
         refreshCourseList();
+    }
+
+    // MODIFIES: this
+    // EFFECTS: creates the top panel with term selector and header
+    private JPanel createTopPanel() {
+        JPanel topPanel = new JPanel(new BorderLayout());
+
+        JPanel termPanel = new JPanel();
+        JLabel termLabel = new JLabel("Select Term: ");
+        termPanel.add(termLabel);
+
+        termSelector = new JComboBox<>();
+        termPanel.add(termSelector);
+
+        JButton addTermButton = new JButton("Add Term");
+        addTermButton.addActionListener(e -> handleAddTerm());
+        termPanel.add(addTermButton);
+
+        header = new JLabel("Courses in " + currentTerm.getTermName() + " " + currentTerm.getTermYear());
+        header.setHorizontalAlignment(SwingConstants.CENTER);
+
+        topPanel.add(termPanel, BorderLayout.WEST);
+        topPanel.add(header, BorderLayout.CENTER);
+        refreshTermSelector();
+        termSelector.addActionListener(e -> handleTermChanged());
+        
+        return topPanel;
     }
 
     // MODIFIES: this
@@ -109,6 +135,64 @@ public class GradeTrackerUI extends JFrame {
         menuBar.add(fileMenu);
         
         setJMenuBar(menuBar);
+    }
+
+    // MODIFIES: this
+    // EFFECTS: prompts user to add new term and makes it the current term
+    private void handleAddTerm() {
+        String name = showInputDialog(this, "Enter term name:");
+        if (name == null || name.trim().isEmpty()) {
+            return;
+        }
+
+        String yearText = showInputDialog(this, "Enter year:");
+        if (yearText == null || yearText.trim().isEmpty()) {
+            return;
+        }
+
+        try {
+            int year = Integer.parseInt(yearText.trim());
+            Term t = new Term(name.trim(), year);
+            terms.add(t);
+            currentTerm = t;
+            refreshTermSelector();
+            header.setText("Courses in " + currentTerm.getTermName() + " " + currentTerm.getTermYear());
+            refreshCourseList();
+        } catch (NumberFormatException e) {
+            showMessageDialog(this, "Invalid year.");
+        }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: updates currentTerm when term selection changes
+    private void handleTermChanged() {
+        Term selected = (Term) termSelector.getSelectedItem();
+        if (selected == null) {
+            return;
+        }
+
+        currentTerm = selected;
+
+        if (header != null) {
+            header.setText("Courses in " + currentTerm.getTermName() + " " + currentTerm.getTermYear());
+        }
+
+        refreshCourseList();
+    }
+
+    // MODIFIES: this
+    // EFFECTS: refreshes the term selector based on terms list
+    private void refreshTermSelector() {
+        if (termSelector == null) {
+            return;
+        }
+
+        termSelector.removeAllItems();
+
+        for (Term t : terms) {
+            termSelector.addItem(t);
+        }
+        termSelector.setSelectedItem(currentTerm);
     }
 
     // MODIFIES: this
@@ -261,10 +345,11 @@ public class GradeTrackerUI extends JFrame {
 
             terms = loaded;
             currentTerm = terms.get(0);
+            refreshTermSelector();
             header.setText("Courses in " + currentTerm.getTermName() + " " + currentTerm.getTermYear());
             refreshCourseList();
 
-            JOptionPane.showMessageDialog(this, "Loaded " + terms.size() + " terms from file." + " term(s).");
+            JOptionPane.showMessageDialog(this, "Loaded " + terms.size() + " terms from file.");
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Failed to load: " + e.getMessage());
         }

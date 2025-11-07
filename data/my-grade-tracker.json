@@ -1,18 +1,30 @@
-{"terms": [{
-  "courses": [
-    {
-      "assignments": [],
-      "credits": 4,
-      "courseCode": "CPSC_210",
-      "isCore": true
-    },
-    {
+{"terms": [
+  {
+    "courses": [
+      {
+        "assignments": [],
+        "credits": 4,
+        "courseCode": "CPSC_210",
+        "isCore": true
+      },
+      {
+        "assignments": [],
+        "credits": 3,
+        "courseCode": "ECON_101",
+        "isCore": false
+      }
+    ],
+    "year": 2025,
+    "termName": "Term 1"
+  },
+  {
+    "courses": [{
       "assignments": [],
       "credits": 3,
-      "courseCode": "ECON_101",
-      "isCore": false
-    }
-  ],
-  "year": 2025,
-  "termName": "Term 1"
-}]}
+      "courseCode": "MATH_100",
+      "isCore": true
+    }],
+    "year": 2024,
+    "termName": "Term 2"
+  }
+]}

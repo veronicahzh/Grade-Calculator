@@ -77,6 +77,7 @@ public class Term implements Writable {
         return totalWeighted / totalCredits;
     }
 
+    @Override
     public JSONObject toJson() {
         JSONObject json = new JSONObject();
         json.put("termName", termName);
@@ -88,5 +89,10 @@ public class Term implements Writable {
         }
         json.put("courses", jsonArray);
         return json;
+    }
+
+    @Override
+    public String toString() {
+        return termName + " (" + year + ")";
     }
 }
