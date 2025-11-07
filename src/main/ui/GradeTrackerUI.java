@@ -11,6 +11,7 @@ import static javax.swing.JOptionPane.*;
 import ca.ubc.cs.ExcludeFromJacocoGeneratedReport;
 import model.Assignment;
 import model.Course;
+import model.GradeCalculator;
 import model.Term;
 import persistence.JsonReader;
 import persistence.JsonWriter;
@@ -94,7 +95,14 @@ public class GradeTrackerUI extends JFrame {
     // EFFECTS: creates the button panel with action buttons
     private JPanel createButtonPanel() {
         JPanel buttonPanel = new JPanel();
+        addCourseButtons(buttonPanel);
+        addFilterAndViewButtons(buttonPanel);
+        return buttonPanel;
+    }
 
+    // MODIFIES: this
+    // EFFECTS: adds add/remove course/assignment buttons to panel
+    private void addCourseButtons(JPanel buttonPanel) {
         JButton addCourseButton = new JButton("Add Course");
         addCourseButton.addActionListener(e -> handleAddCourse());
         buttonPanel.add(addCourseButton);
@@ -103,10 +111,6 @@ public class GradeTrackerUI extends JFrame {
         addAssignmentButton.addActionListener(e -> handleAddAssignment());
         buttonPanel.add(addAssignmentButton);
 
-        JButton filterCoursesButton = new JButton("Filter Courses");
-        filterCoursesButton.addActionListener(e -> handleFilterCourses());
-        buttonPanel.add(filterCoursesButton);
-
         JButton removeCourseButton = new JButton("Remove Course");
         removeCourseButton.addActionListener(e -> handleRemoveCourse());
         buttonPanel.add(removeCourseButton);
@@ -114,8 +118,22 @@ public class GradeTrackerUI extends JFrame {
         JButton removeAssignmentButton = new JButton("Remove Assignment");
         removeAssignmentButton.addActionListener(e -> handleRemoveAssignment());
         buttonPanel.add(removeAssignmentButton);
+    }
 
-        return buttonPanel;
+    // MODIFIES: this
+    // EFFECTS: adds filter and view buttons to panel
+    private void addFilterAndViewButtons(JPanel buttonPanel) {
+        JButton filterCoursesButton = new JButton("Filter Courses");
+        filterCoursesButton.addActionListener(e -> handleFilterCourses());
+        buttonPanel.add(filterCoursesButton);
+
+        JButton viewAssignmentsButton = new JButton("View Assignments");
+        viewAssignmentsButton.addActionListener(e -> handleViewAssignments());
+        buttonPanel.add(viewAssignmentsButton);
+
+        JButton viewAveragesButton = new JButton("View Averages");
+        viewAveragesButton.addActionListener(e -> handleViewAverages());
+        buttonPanel.add(viewAveragesButton);
     }
 
     // MODIFIES: this
@@ -132,7 +150,18 @@ public class GradeTrackerUI extends JFrame {
         loadItem.addActionListener(e -> handleLoad());
         fileMenu.add(loadItem);
 
+        JMenu viewMenu = new JMenu("View");
+        
+        JMenuItem viewAssignmentsItem = new JMenuItem("View Assignments");
+        viewAssignmentsItem.addActionListener(e -> handleViewAssignments());
+        viewMenu.add(viewAssignmentsItem);
+
+        JMenuItem viewAveragesItem = new JMenuItem("View Averages");
+        viewAveragesItem.addActionListener(e -> handleViewAverages());
+        viewMenu.add(viewAveragesItem);
+
         menuBar.add(fileMenu);
+        menuBar.add(viewMenu);
         
         setJMenuBar(menuBar);
     }
@@ -231,7 +260,7 @@ public class GradeTrackerUI extends JFrame {
             return;
         }
 
-        int result = showConfirmDialog(this, "Remove course " + selected.getCourseCode() + "?", "Confirm Removal", YES_NO_OPTION);
+        int result = showConfirmDialog(this, "Remove " + selected.getCourseCode() + "?", "Remove?", YES_NO_OPTION);
 
         if (result == YES_OPTION) {
             currentTerm.removeCourse(selected);
@@ -247,32 +276,22 @@ public class GradeTrackerUI extends JFrame {
             showMessageDialog(this, "Please select a course to add an assignment to.");
             return;
         }
-
-        String name = JOptionPane.showInputDialog(this, "Enter Assignment Name:");
-        if (name == null) {
+        String name = promptNonEmpty("Enter Assignment Name:");
+        String weight = promptNonEmpty("Enter Assignment Weight (0.0 - 1.0):");
+        String grade = promptNonEmpty("Enter Assignment Score (0.0 - 100.0):");
+        if (name == null || weight == null || grade == null) {
             return;
         }
-
-        String weight = JOptionPane.showInputDialog(this, "Enter Assignment Weight (0.0 - 1.0):");
-        if (weight == null) {
-            return;
-        }
-
-        String grade = JOptionPane.showInputDialog(this, "Enter Assignment Score (0.0 - 100.0):");
-        if (grade == null) {
-            return;
-        }
-
         try {
             double w = Double.parseDouble(weight);
             double g = Double.parseDouble(grade);
-
-            selected.addAssignment(new Assignment(name.trim(), w, g));
+            selected.addAssignment(new Assignment(name, w, g));
             refreshCourseList();
         } catch (NumberFormatException ex) {
             showMessageDialog(this, "Invalid weight or grade value.");
         }
     }
+
 
         // MODIFIES: this
     // EFFECTS: prompts user to remove selected assignment from selected course
@@ -317,7 +336,178 @@ public class GradeTrackerUI extends JFrame {
         }
     }
 
-        // MODIFIES: this
+    // EFFECTS: shows all assignments for selected course
+    private void handleViewAssignments() {
+        Course selected = courseList.getSelectedValue();
+        if (selected == null) {
+            showMessageDialog(this, "Please select a course first.");
+            return;
+        }
+
+        List<Assignment> assignments = selected.getAssignments();
+        if (assignments.isEmpty()) {
+            showMessageDialog(this, "No assignments in this course.");
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder("Assignments in " + selected.getCourseCode() + ":\n");
+        for (Assignment a : assignments) {
+            String item = "- " + a.getName() + " (" + a.getWeight() + ", " + a.getGrade() + "%)\n";
+            sb.append(item);
+        }
+
+        showMessageDialog(this, sb.toString());
+    }
+
+
+    // EFFECTS: lets user choose how to view averages and displays accordingly
+    private void handleViewAverages() {
+        String[] options = {"By Year", "By Term", "By Course", "By Category"};
+        String msg = "How would you like to view averages?";
+        String title = "View Averages";
+        int choice = showOptionDialog(this, msg, title, DEFAULT_OPTION, QUESTION_MESSAGE, null, options, options[0]);
+
+        if (choice == 0) {
+            showAverageByYearDialog();
+        } else if (choice == 1) {
+            showAverageByTermDialog();
+        } else if (choice == 2) {
+            showAverageByCourseDialog();
+        } else if (choice == 3) {
+            showAverageByCategoryDialog();
+        }
+    }
+
+    // EFFECTS: prompts for year and shows average across all terms in that year
+    private void showAverageByYearDialog() {
+        String yearStr = showInputDialog(this, "Enter academic year:");
+        if (yearStr == null || yearStr.trim().isEmpty()) {
+            return;
+        }
+
+        try {
+            int year = Integer.parseInt(yearStr.trim());
+            double[] totals = calculateYearTotals(year);
+            double totalWeighted = totals[0];
+            double totalCredits = totals[1];
+
+            if (totalCredits == 0.0) {
+                showMessageDialog(this, "No courses found for year " + year);
+                return;
+            }
+
+            double avg = totalWeighted / totalCredits;
+            String letter = GradeCalculator.convertToLetterGrade(avg);
+            double gpa = GradeCalculator.letterToGPA(letter);
+            String msg = "Average for " + year + ": " + fmt(avg) + "% (" + letter + ",) GPA: " + gpa;
+            showMessageDialog(this, msg);
+        } catch (NumberFormatException e) {
+            showMessageDialog(this, "Invalid year.");
+        }
+    }
+
+    // EFFECTS: returns [totalWeighted, totalCredits] for given year
+    private double[] calculateYearTotals(int year) {
+        double totalWeighted = 0.0;
+        double totalCredits = 0.0;
+
+        for (Term t : terms) {
+            if (t.getTermYear() == year) {
+                for (Course c : t.getCourses()) {
+                    totalWeighted += c.getCourseAverage() * c.getCredits();
+                    totalCredits += c.getCredits();
+                }
+            }
+        }
+        return new double[] {totalWeighted, totalCredits};
+    }
+
+    // EFFECTS: shows average and GPA for each term
+    private void showAverageByTermDialog() {
+        if (terms.isEmpty()) {
+            showMessageDialog(this, "No terms available.");
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (Term t : terms) {
+            double avg = t.getTermAverage();
+            String letter = GradeCalculator.convertToLetterGrade(avg);
+            double gpa = GradeCalculator.letterToGPA(letter);
+
+            String termLabel = t.getTermName() + " (" + t.getTermYear() + ":) ";
+            String avgLabel = fmt(avg) + "% (" + letter + "), GPA: " + gpa;
+            
+            sb.append(termLabel).append(avgLabel).append("\n");
+        }
+        showMessageDialog(this, sb.toString());
+    }
+
+    // EFFECTS: shows average and GPA for each course in currentTerm
+    private void showAverageByCourseDialog() {
+        if (currentTerm.getCourses().isEmpty()) {
+            showMessageDialog(this, "No courses in current term.");
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        String headerLine = "Course averages for " + currentTerm.getTermName();
+        headerLine += " (" + currentTerm.getTermYear() + "):\n";
+        sb.append(headerLine);
+
+        for (Course c : currentTerm.getCourses()) {
+            double avg = c.getCourseAverage();
+            String letter = GradeCalculator.convertToLetterGrade(avg);
+            double gpa = GradeCalculator.letterToGPA(letter);
+            String courseLine = c.getCourseCode() + ": " + fmt(avg) + "% (" + letter + "), GPA: " + gpa + "\n";
+            
+            sb.append(courseLine);
+        }
+
+        showMessageDialog(this, sb.toString());
+    }
+
+    // EFFECTS: shows average and GPA for core/elective courses in currentTerm
+    private void showAverageByCategoryDialog() {
+        if (currentTerm.getCourses().isEmpty()) {
+            showMessageDialog(this, "No courses in current term.");
+            return;
+        }
+
+        String[] options = {"Core Courses", "Elective Courses"};
+        String msg = "Which category do you want to view?";
+        int choice = showOptionDialog(this, msg, "Average by Category", DEFAULT_OPTION, QUESTION_MESSAGE, null, options, options[0]);
+
+        if (choice < 0) {
+            return;
+        }
+
+        double totalWeighted = 0.0;
+        double totalCredits = 0.0;
+
+        for (Course c : currentTerm.getCourses()) {
+            if ((choice == 0 && c.checkIsCore()) || (choice == 1 && !c.checkIsCore())) {
+                totalWeighted += c.getCourseAverage() * c.getCredits();
+                totalCredits += c.getCredits();
+            }
+        }
+
+        if (totalCredits == 0.0) {
+            String cat = (choice == 0) ? "core" : "elective";
+            showMessageDialog(this, "No " + cat + " courses in current term.");
+            return;
+        }
+
+        double avg = totalWeighted / totalCredits;
+        String letter = GradeCalculator.convertToLetterGrade(avg);
+        double gpa = GradeCalculator.letterToGPA(letter);
+
+        String catLabel = (choice == 0) ? "Core Courses" : "Elective Courses";
+        String result = "Average for " + catLabel + " courses in " + currentTerm.getTermName() + " (" + currentTerm.getTermYear() + "): " + fmt(avg) + "% (" + letter + "), GPA: " + gpa;
+        showMessageDialog(this, result);
+    }
+
+    // MODIFIES: this
     // EFFECTS: saves terms list to DATA_FILE
     private void handleSave() {
         ensureDataDir();
@@ -400,6 +590,11 @@ public class GradeTrackerUI extends JFrame {
         String title = "Remove Assignment";
         int choice = showOptionDialog(this, msg, title, DEFAULT_OPTION, QUESTION_MESSAGE, null, options, options[0]);
         return choice;
+    }
+
+    // EFFECTS: returns value formatted to 1 decimal place
+    private String fmt(double value) {
+        return String.format("%.1f", value);
     }
 
     // EFFECTS: starts the GradeTracker GUI
