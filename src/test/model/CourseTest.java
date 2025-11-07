@@ -89,4 +89,24 @@ public class CourseTest {
         assertEquals("CPSC_210 (4 credits), Core", c1.toString());
         assertEquals("ECON_101 (3 credits), Elective", c2.toString());
     }
+
+    @Test
+    void testRemoveAssignmentPresent() {
+        c1.addAssignment(a1);
+        c1.addAssignment(a2);
+        c1.addAssignment(a3);
+        assertEquals(3, c1.getAssignments().size());
+        c1.removeAssignment(a2);
+        assertEquals(2, c1.getAssignments().size());
+        assertFalse(c1.getAssignments().contains(a2));
+    }
+
+    @Test
+    void testRemoveAssignmentNotPresent() {
+        c1.addAssignment(a1);
+        assertEquals(1, c1.getAssignments().size());
+        c1.removeAssignment(a2);
+        assertEquals(1, c1.getAssignments().size());
+        assertTrue(c1.getAssignments().contains(a1));
+    }
 }

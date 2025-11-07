@@ -32,6 +32,12 @@ public class Term implements Writable {
         courses.add(c);
     }
 
+    // MODIFIES: this
+    // EFFECTS: removes the course c from the list of courses for this term
+    public void removeCourse(Course c) {
+        courses.remove(c);
+    }
+
     // EFFECTS: returns the name of this term
     public String getTermName() {
         return termName;

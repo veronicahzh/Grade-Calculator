@@ -85,4 +85,23 @@ public class TermTest {
         t1.addCourse(zeroCredit);
         assertEquals(0.0, t1.getTermAverage());
     }
+
+    @Test
+    void testRemoveCoursePresent() {
+        t1.addCourse(c1);
+        t1.addCourse(c2);
+        assertEquals(2, t1.getCourses().size());
+        t1.removeCourse(c1);
+        assertEquals(1, t1.getCourses().size());
+        assertEquals(c2, t1.getCourses().get(0));
+    }
+
+    @Test
+    void testRemoveCourseNotPresent() {
+        t1.addCourse(c1);
+        assertEquals(1, t1.getCourses().size());
+        t1.removeCourse(c2);
+        assertEquals(1, t1.getCourses().size());
+        assertEquals(c1, t1.getCourses().get(0));
+    }
 }

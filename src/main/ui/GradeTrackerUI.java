@@ -9,7 +9,7 @@ import java.util.*;
 import static javax.swing.JOptionPane.*;
 
 import ca.ubc.cs.ExcludeFromJacocoGeneratedReport;
-
+import model.Assignment;
 import model.Course;
 import model.Term;
 import persistence.JsonReader;
@@ -59,18 +59,37 @@ public class GradeTrackerUI extends JFrame {
         JScrollPane scrollPane = new JScrollPane(courseList);
         add(scrollPane, BorderLayout.CENTER);
 
+        add(createButtonPanel(), BorderLayout.SOUTH);
+
+        refreshCourseList();
+    }
+
+    // MODIFIES: this
+    // EFFECTS: creates the button panel with action buttons
+    private JPanel createButtonPanel() {
         JPanel buttonPanel = new JPanel();
+
         JButton addCourseButton = new JButton("Add Course");
         addCourseButton.addActionListener(e -> handleAddCourse());
         buttonPanel.add(addCourseButton);
+
+        JButton addAssignmentButton = new JButton("Add Assignment");
+        addAssignmentButton.addActionListener(e -> handleAddAssignment());
+        buttonPanel.add(addAssignmentButton);
 
         JButton filterCoursesButton = new JButton("Filter Courses");
         filterCoursesButton.addActionListener(e -> handleFilterCourses());
         buttonPanel.add(filterCoursesButton);
 
-        add(buttonPanel, BorderLayout.SOUTH);
+        JButton removeCourseButton = new JButton("Remove Course");
+        removeCourseButton.addActionListener(e -> handleRemoveCourse());
+        buttonPanel.add(removeCourseButton);
 
-        refreshCourseList();
+        JButton removeAssignmentButton = new JButton("Remove Assignment");
+        removeAssignmentButton.addActionListener(e -> handleRemoveAssignment());
+        buttonPanel.add(removeAssignmentButton);
+
+        return buttonPanel;
     }
 
     // MODIFIES: this
@@ -117,6 +136,77 @@ public class GradeTrackerUI extends JFrame {
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Invalid credits value.");
         }
+    }
+
+    // MODIIFES: this
+    // EFFECTS: prompts user to remove selected course from currentTerm
+    private void handleRemoveCourse() {
+        Course selected = courseList.getSelectedValue();
+        if (selected == null) {
+            showMessageDialog(this, "Please select a course to remove.");
+            return;
+        }
+
+        int result = showConfirmDialog(this, "Remove course " + selected.getCourseCode() + "?", "Confirm Removal", YES_NO_OPTION);
+
+        if (result == YES_OPTION) {
+            currentTerm.removeCourse(selected);
+            refreshCourseList();
+        }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: prompts user to add a new assignment to selected course
+    private void handleAddAssignment() {
+        Course selected = courseList.getSelectedValue();
+        if (selected == null) {
+            showMessageDialog(this, "Please select a course to add an assignment to.");
+            return;
+        }
+
+        String name = JOptionPane.showInputDialog(this, "Enter Assignment Name:");
+        if (name == null) {
+            return;
+        }
+
+        String weight = JOptionPane.showInputDialog(this, "Enter Assignment Weight (0.0 - 1.0):");
+        if (weight == null) {
+            return;
+        }
+
+        String grade = JOptionPane.showInputDialog(this, "Enter Assignment Score (0.0 - 100.0):");
+        if (grade == null) {
+            return;
+        }
+
+        try {
+            double w = Double.parseDouble(weight);
+            double g = Double.parseDouble(grade);
+
+            selected.addAssignment(new Assignment(name.trim(), w, g));
+            refreshCourseList();
+        } catch (NumberFormatException ex) {
+            showMessageDialog(this, "Invalid weight or grade value.");
+        }
+    }
+
+        // MODIFIES: this
+    // EFFECTS: prompts user to remove selected assignment from selected course
+    private void handleRemoveAssignment() {
+        Course selected = courseList.getSelectedValue();
+        if (selected == null) {
+            showMessageDialog(this, "Please select a course first.");
+            return;
+        }
+
+        int index = chooseAssignmentIndex(selected);
+        if (index < 0) {
+            return;
+        }
+
+        Assignment toRemove = selected.getAssignments().get(index);
+        selected.removeAssignment(toRemove);
+        showMessageDialog(this, "Removed assignment: " + toRemove.getName());
     }
 
     // MODIFIES: this
@@ -191,6 +281,40 @@ public class GradeTrackerUI extends JFrame {
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Failed to create data directory: " + e.getMessage());
         }
+    }
+
+    // EFFECTS: proompts user and reutrn trimmed non-empty input, or null if cancelled/empty
+    private String promptNonEmpty(String prompt) {
+        String value = showInputDialog(this, prompt);
+        if (value == null ) {
+            return null;
+        }
+
+        value = value.trim();
+        if (value.isEmpty()) {
+            return null;
+        }
+
+        return value;
+    }
+
+    // EFFECTS: lets user choose an assignment from course; returns index or -1
+    private int chooseAssignmentIndex(Course course) {
+        List<Assignment> assignments = course.getAssignments();
+        if (assignments.isEmpty()) {
+            showMessageDialog(this, "No assignments to remove in this course.");
+            return -1;
+        }
+
+        String[] options = new String[assignments.size()];
+        for (int i = 0; i < assignments.size(); i++) {
+            options[i] = assignments.get(i).getName();
+        }
+
+        String msg = "Select an assignment to remove:";
+        String title = "Remove Assignment";
+        int choice = showOptionDialog(this, msg, title, DEFAULT_OPTION, QUESTION_MESSAGE, null, options, options[0]);
+        return choice;
     }
 
     // EFFECTS: starts the GradeTracker GUI

@@ -55,12 +55,24 @@ public class GradeTrackerApp {
                 return run(this::viewAverages);
             case "5": 
                 return run(this::viewItems);
+            default:
+                return processSecondaryCommand(c);
+        }
+    }
+
+    // EFFECTS: handles remaining menu commands; returns false to quit, true to continue
+    private boolean processSecondaryCommand(String c) {
+        switch (c) {
             case "6": 
                 return quit();
             case "7": 
                 return run(this::saveToFile);
             case "8": 
                 return run(this::loadFromFile);
+            case "9": 
+                return run(this::removeCourseFromTerm);
+            case "10": 
+                return run(this::removeAssignmentFromCourse);
             default: 
                 return invalid();
         }
@@ -96,6 +108,8 @@ public class GradeTrackerApp {
         System.out.println("6 --> Quit");
         System.out.println("7 --> Save to file");
         System.out.println("8 --> Load from file");
+        System.out.println("9 --> Remove course from term");
+        System.out.println("10 --> Remove assignment from course");
         System.out.println("Select option: ");
     }
 
@@ -140,6 +154,35 @@ public class GradeTrackerApp {
     }
 
     // MODIFIES: this
+    // EFFECTS: removes a course from a chosen term
+    private void removeCourseFromTerm() {
+        if (terms.isEmpty()) {
+            System.out.println("No terms available. Please add one first.");
+            return;
+        }
+
+        int termIndex = chooseTermIndex();
+        if (termIndex == -1) {
+            return;
+        }
+
+        Term term = terms.get(termIndex);
+        if (term.getCourses().isEmpty()) {
+            System.out.println("No courses in this term.");
+            return;
+        }
+
+        int courseIndex = chooseCourseIndex(term);
+        if (courseIndex == -1) {
+            return;
+        }
+
+        Course toRemove = term.getCourses().get(courseIndex);
+        term.removeCourse(toRemove);
+        System.out.println("Removed course " + toRemove.getCourseCode() + " from " + term.getTermName() + ".");
+    }
+
+    // MODIFIES: this
     // EFFECTS: lets user pick a term, then a course, then add an assignment to that course
     private void addAssignmentToCourse() {
         if (terms.isEmpty()) {
@@ -167,6 +210,69 @@ public class GradeTrackerApp {
         Assignment a = promptAssignment();
         course.addAssignment(a);
         System.out.println("Added assignment \"" + a.getName() + "\" to " + course.getCourseCode());
+    }
+
+    // MODIFIES: this
+    // EFFECTS: removes an assignment chosen by the user from a course in a term
+    private void removeAssignmentFromCourse() {
+        Course course = chooseCourseForModification();
+        if (course == null) {
+            return;
+        }
+        
+        int assignmentIndex = chooseAssignmentIndex(course);
+        if (assignmentIndex == -1) {
+            return;
+        }
+
+        Assignment toRemove = course.getAssignments().get(assignmentIndex);
+        course.removeAssignment(toRemove);
+        System.out.println("Removed assignment \"" + toRemove.getName() + "\" from " + course.getCourseCode() + ".");
+    }
+
+    // MODIFIES: this
+    // EFFECTS: prompts user to choose a course from a term;
+    // if valid, returns the course, otherwise prints error and returns null
+    private Course chooseCourseForModification() {
+        if (terms.isEmpty()) {
+            System.out.println("No terms available. Please add a term first.");
+            return null;
+        }
+
+        int termIndex = chooseTermIndex();
+        if (termIndex == -1) {
+            return null;
+        }
+        
+        Term term = terms.get(termIndex);
+        if (term.getCourses().isEmpty()) {
+            System.out.println("No courses in this term.");
+            return null;
+        }
+
+        int courseIndex = chooseCourseIndex(term);
+        if (courseIndex == -1) {
+            return null;
+        }
+
+        return term.getCourses().get(courseIndex);
+    }
+
+    // MODIFIES: this
+    // EFFECTS: prompts user to choose an assignment from the given course;
+    // if valid, returns 0-based index, otherwise prints error
+    private int chooseAssignmentIndex(Course course) {
+        if (course.getAssignments().isEmpty()) {
+            System.out.println("No assignments in this course.");
+            return -1;
+        }
+
+        System.out.println("Select an assignment to remove:");
+        for (int i = 0; i < course.getAssignments().size(); i++) {
+            System.out.println((i + 1) + ": " + course.getAssignments().get(i).getName());
+        }
+
+        return readIndex(course.getAssignments().size(), "Invalid assignment selection.");
     }
 
     // MODIFIES: this

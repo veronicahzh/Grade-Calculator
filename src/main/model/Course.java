@@ -36,6 +36,12 @@ public class Course implements Writable {
         assignments.add(a);
     }
 
+    // MODIIFES: this
+    // EFFECTS: removes the assignment a from the list of assignments for this course
+    public void removeAssignment(Assignment a) {
+        assignments.remove(a);
+    }
+
     // EFFECTS: returns the course code of this course
     public String getCourseCode() {
         return courseCode;

@@ -17,8 +17,8 @@ I am personally interested in this project because I enjoy keeping track of my g
 
 ## User Stories
 
-- **Add items to collections:**
-As a user, I want to be able to add an assignment (or other graded item) to a given class, or add a class to a term (e.g., Term 1 or Term 2), a year (e.g., first year, second year), or a specific category (e.g., CPSC, MATH).
+- **Add and remove items to collections:**
+As a user, I want to be able to add/remove an assignment (or other graded item) to a given class, or add/remove a class to a term (e.g., Term 1 or Term 2), a year (e.g., first year, second year), or a specific category (e.g., CPSC, MATH).
 
 - **View lists of items:**
 As a user, I want to be able to view the list of assignments in a class or view a list of classes within a term or a year.
