@@ -500,23 +500,14 @@ public class GradeTrackerUI extends JFrame {
             return;
         }
 
-        String[] options = {"Core Courses", "Elective Courses"};
-        String msg = "Which category do you want to view?";
-        int choice = showOptionDialog(this, msg, "Average by Category", DEFAULT_OPTION, QUESTION_MESSAGE, null, options, options[0]);
-
+        int choice = promptCategoryChoice();
         if (choice < 0) {
             return;
         }
 
-        double totalWeighted = 0.0;
-        double totalCredits = 0.0;
-
-        for (Course c : currentTerm.getCourses()) {
-            if ((choice == 0 && c.checkIsCore()) || (choice == 1 && !c.checkIsCore())) {
-                totalWeighted += c.getCourseAverage() * c.getCredits();
-                totalCredits += c.getCredits();
-            }
-        }
+        double[] totals = calculateCategoryTotals(choice);
+        double totalWeighted = totals[0];
+        double totalCredits = totals[1];
 
         if (totalCredits == 0.0) {
             String cat = (choice == 0) ? "core" : "elective";
@@ -524,12 +515,43 @@ public class GradeTrackerUI extends JFrame {
             return;
         }
 
+        showCategoryAverage(choice, totalWeighted, totalCredits);
+    }
+
+    // EFFECTS: prompts user for category
+    private int promptCategoryChoice() {
+        String[] opts = {"Core Courses", "Elective Courses"};
+        String msg = "Which category do you want to view?";
+        String t = "Average by Category";
+        Object init = opts[0];
+        int choice = showOptionDialog(this, msg, t, DEFAULT_OPTION, QUESTION_MESSAGE, null, opts, init);
+        return choice;
+    }
+
+    // EFFECTS: returns [totalWeighted, totalCredits] for chosen category
+    private double[] calculateCategoryTotals(int category) {
+        double totalWeighted = 0.0;
+        double totalCredits = 0.0;
+
+        for (Course c : currentTerm.getCourses()) {
+            if ((category == 0 && c.checkIsCore()) || (category == 1 && !c.checkIsCore())) {
+                totalWeighted += c.getCourseAverage() * c.getCredits();
+                totalCredits += c.getCredits();
+            }
+        }
+        return new double[] {totalWeighted, totalCredits};
+    }
+
+    // EFFECTSL shows the final average result for the chosen category
+    private void showCategoryAverage(int category, double totalWeighted, double totalCredits) {
         double avg = totalWeighted / totalCredits;
         String letter = GradeCalculator.convertToLetterGrade(avg);
         double gpa = GradeCalculator.letterToGPA(letter);
 
-        String catLabel = (choice == 0) ? "Core Courses" : "Elective Courses";
-        String result = "Average for " + catLabel + " courses in " + currentTerm.getTermName() + " (" + currentTerm.getTermYear() + "): " + fmt(avg) + "% (" + letter + "), GPA: " + gpa;
+        String catLabel = (category == 0) ? "core" : "elective ";
+        String result = "Average for " + catLabel + " courses in ";
+        result += currentTerm.getTermName() + " (" + currentTerm.getTermYear() + "): ";
+        result += fmt(avg) + "% (" + letter + "), GPA: " + gpa;
         showMessageDialog(this, result);
     }
 
@@ -588,7 +610,7 @@ public class GradeTrackerUI extends JFrame {
     // EFFECTS: prompts user and return trimmed non-empty input, or null if cancelled/empty
     private String promptNonEmpty(String prompt) {
         String value = showInputDialog(this, prompt);
-        if (value == null ) {
+        if (value == null) {
             return null;
         }
 
@@ -630,19 +652,24 @@ public class GradeTrackerUI extends JFrame {
         StringBuilder sb = new StringBuilder();
         sb.append("Course Code: ").append(selected.getCourseCode()).append("\n");
         sb.append("Credits: ").append(selected.getCredits()).append("\n");
-        sb.append("Type: ").append(selected.checkIsCore() ? "Core" : "Elective").append("\n");
-        
+
+        String type = selected.checkIsCore() ? "core" : "elective";
+        sb.append("Type: ").append(type).append("\n");
+
         double avg = selected.getCourseAverage();
         String letter = GradeCalculator.convertToLetterGrade(avg);
         double gpa = GradeCalculator.letterToGPA(letter);
-        sb.append("Average: ").append(fmt(avg)).append("% (").append(letter).append("), GPA: ").append(gpa).append("\n");
+        String avgLine = "Average: " + fmt(avg) + "% (" + letter + "), GPA: " + gpa + "\n";
+        sb.append(avgLine);
 
         sb.append("Assignments:\n");
         for (Assignment a : selected.getAssignments()) {
-            sb.append("- ").append(a.getName()).append(": Weight ").append(a.getWeight()).append(", Grade ").append(a.getGrade()).append("%\n");
+            String line = "- " + a.getName() + ": Weight " + a.getWeight() + ", Grade " + a.getGrade() + "%\n";
+            sb.append(line);
         }
         courseDetails.setText(sb.toString());
     }
+
 
     // MODIFIES: this
     // EFFECTS: updates progress bar to show current term average

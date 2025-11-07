@@ -37,3 +37,17 @@ As a user, I want to have the option to save my entire grade tracker — includi
 
 - **Load grade tracker from file:**
 As a user, I want to have the option to load a previously saved grade tracker file so that I can continue tracking my grades from where I left off.
+
+## Instructions for End User
+
+- You can view the panel that displays the Xs that have already been added to the Y by launching the Grade Tracker application and looking at the main list in the center of the window. This list shows all **courses (Xs)** that have been added to the **currently selected term (Y)**. You can change the term using the **"Select Term"** drop-down in the top-left; the course list will update for that term.
+
+- You can generate the first required action related to the user story "adding multiple Xs to a Y" by **adding a course to a term**. To do this, click the **"Add Course"** button in the bottom button panel, then enter the course code, credits, and whether it is a core course. The new course (X) will be added to the current term (Y) and appear in the course list.
+
+- You can generate the second required action related to the user story "adding multiple Xs to a Y" by **filtering which courses in a term are shown**. Click the **"Filter Courses"** button in the bottom button panel, then choose **"All"**, **"Core"**, or **"Elective"** in the dialog that appears. This filters the list of courses (Xs) shown for the current term (Y).
+
+- You can locate my visual component by looking at the **top area of the window**, just below the term header. There is a **Term Average progress bar** labeled with text like `Term Average: 0.0%` that visually shows your current term’s average grade as a bar that fills from 0 to 100%.
+
+- You can save the state of my application by going to the menu bar at the top, clicking **"File"**, and then selecting **"Save"**. This writes all of your terms, courses, and assignments to `./data/my-grade-tracker.json`.
+
+- You can reload the state of my application by going to the menu bar at the top, clicking **"File"**, and then selecting **"Load"**. This reads your previously saved terms, courses, and assignments from `./data/my-grade-tracker.json` and repopulates the GUI.
