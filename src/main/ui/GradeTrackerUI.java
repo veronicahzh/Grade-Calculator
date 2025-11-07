@@ -50,7 +50,51 @@ public class GradeTrackerUI extends JFrame {
         JScrollPane scrollPane = new JScrollPane(courseList);
         add(scrollPane, BorderLayout.CENTER);
 
+        JPanel buttonPanel = new JPanel();
+        JButton addCourseButton = new JButton("Add Course");
+        addCourseButton.addActionListener(e -> handleAddCourse());
+        buttonPanel.add(addCourseButton);
+        add(buttonPanel, BorderLayout.SOUTH);
+
+        refreshCourseList();
     }
+
+    // MODIFIES: this
+    // EFFECTS: prompts user to add a new course and adds it to currentTerm
+    private void handleAddCourse() {
+        String code = JOptionPane.showInputDialog(this, "Enter Course Code (XXXX_000):");
+        if (code == null || code.trim().isEmpty()) {
+            return;
+        }
+
+        String creditsStr = JOptionPane.showInputDialog(this, "Enter Credits:");
+        if (creditsStr == null || creditsStr.trim().isEmpty()) {
+            return;
+        }
+
+        try {
+            int credits = Integer.parseInt(creditsStr);
+            int option = JOptionPane.showConfirmDialog(this, "Is this a core course?", "Course Type",
+                    JOptionPane.YES_NO_OPTION);
+            boolean isCore = (option == JOptionPane.YES_OPTION);
+
+            Course c = new Course(code.trim(), credits, isCore);
+            currentTerm.addCourse(c);
+            refreshCourseList();
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Invalid credits value.");
+        }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: updates the list to show all courses in currentTerm
+    private void refreshCourseList() {
+        courseListModel.clear();
+        for (Course c : currentTerm.getCourses()) {
+            courseListModel.addElement(c);
+        }
+    }
+
 
     // EFFECTS: starts the GradeTracker GUI
     public static void main(String[] args) {
