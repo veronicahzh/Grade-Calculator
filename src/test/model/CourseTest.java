@@ -83,4 +83,10 @@ public class CourseTest {
         c1.addAssignment(assignmentZeroTwo);
         assertEquals(0.0, c1.getCourseAverage());
     }
+
+    @Test
+    void testToStringCoreAndElective() {
+        assertEquals("CPSC_210 (4 credits), Core", c1.toString());
+        assertEquals("ECON_101 (3 credits), Elective", c2.toString());
+    }
 }
