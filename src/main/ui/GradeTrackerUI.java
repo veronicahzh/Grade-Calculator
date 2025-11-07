@@ -3,6 +3,7 @@ package ui;
 import javax.swing.*;
 import java.awt.BorderLayout;
 import java.util.*;
+import static javax.swing.JOptionPane.*;
 
 import ca.ubc.cs.ExcludeFromJacocoGeneratedReport;
 
@@ -54,6 +55,11 @@ public class GradeTrackerUI extends JFrame {
         JButton addCourseButton = new JButton("Add Course");
         addCourseButton.addActionListener(e -> handleAddCourse());
         buttonPanel.add(addCourseButton);
+
+        JButton filterCoursesButton = new JButton("Filter Courses");
+        filterCoursesButton.addActionListener(e -> handleFilterCourses());
+        buttonPanel.add(filterCoursesButton);
+
         add(buttonPanel, BorderLayout.SOUTH);
 
         refreshCourseList();
@@ -92,6 +98,21 @@ public class GradeTrackerUI extends JFrame {
         courseListModel.clear();
         for (Course c : currentTerm.getCourses()) {
             courseListModel.addElement(c);
+        }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: filters courses shown in the list by core/elective/all status
+    private void handleFilterCourses() {
+        String[] options = {"All", "Core", "Elective"};
+        String msg = "Which courses do you want to see?";
+        String title = "Filter Courses";
+        int choice = showOptionDialog(this, msg, title, DEFAULT_OPTION, QUESTION_MESSAGE, null, options, options[0]);
+        courseListModel.clear();
+        for (Course c : currentTerm.getCourses()) {
+            if (choice == 0 || (choice == 1 && c.checkIsCore()) || (choice == 2 && !c.checkIsCore())) {
+                courseListModel.addElement(c);
+            }
         }
     }
 
