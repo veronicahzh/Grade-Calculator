@@ -23,6 +23,8 @@ public class GradeTrackerUI extends JFrame {
     private List<Term> terms;
     private Term currentTerm;
     private JComboBox<Term> termSelector;
+    private JTextArea courseDetails;
+    private JProgressBar termAverageBar;
 
     private JLabel header;
     private DefaultListModel<Course> courseListModel;
@@ -59,7 +61,17 @@ public class GradeTrackerUI extends JFrame {
         JScrollPane scrollPane = new JScrollPane(courseList);
         add(scrollPane, BorderLayout.CENTER);
 
+        courseDetails = new JTextArea();
+        courseDetails.setEditable(false);
+        JScrollPane detailsScrollPane = new JScrollPane(courseDetails);
+        detailsScrollPane.setBorder(BorderFactory.createTitledBorder("Course Details"));
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane, detailsScrollPane);
+        splitPane.setResizeWeight(0.5);
+        courseList.addListSelectionListener(e -> updateCourseDetails());
+
         add(createButtonPanel(), BorderLayout.SOUTH);
+        add(splitPane, BorderLayout.CENTER);
 
         refreshCourseList();
     }
@@ -83,8 +95,14 @@ public class GradeTrackerUI extends JFrame {
         header = new JLabel("Courses in " + currentTerm.getTermName() + " " + currentTerm.getTermYear());
         header.setHorizontalAlignment(SwingConstants.CENTER);
 
+        termAverageBar = new JProgressBar(0, 100);
+        termAverageBar.setStringPainted(true);
+        updateTermAverageBar();
+
         topPanel.add(termPanel, BorderLayout.WEST);
         topPanel.add(header, BorderLayout.CENTER);
+        topPanel.add(termAverageBar, BorderLayout.SOUTH);
+
         refreshTermSelector();
         termSelector.addActionListener(e -> handleTermChanged());
         
@@ -187,6 +205,7 @@ public class GradeTrackerUI extends JFrame {
             refreshTermSelector();
             header.setText("Courses in " + currentTerm.getTermName() + " " + currentTerm.getTermYear());
             refreshCourseList();
+            updateTermAverageBar();
         } catch (NumberFormatException e) {
             showMessageDialog(this, "Invalid year.");
         }
@@ -207,6 +226,7 @@ public class GradeTrackerUI extends JFrame {
         }
 
         refreshCourseList();
+        updateTermAverageBar();
     }
 
     // MODIFIES: this
@@ -246,6 +266,7 @@ public class GradeTrackerUI extends JFrame {
             Course c = new Course(code.trim(), credits, isCore);
             currentTerm.addCourse(c);
             refreshCourseList();
+            updateTermAverageBar();
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Invalid credits value.");
         }
@@ -265,6 +286,7 @@ public class GradeTrackerUI extends JFrame {
         if (result == YES_OPTION) {
             currentTerm.removeCourse(selected);
             refreshCourseList();
+            updateTermAverageBar();
         }
     }
 
@@ -287,6 +309,7 @@ public class GradeTrackerUI extends JFrame {
             double g = Double.parseDouble(grade);
             selected.addAssignment(new Assignment(name, w, g));
             refreshCourseList();
+            updateTermAverageBar();
         } catch (NumberFormatException ex) {
             showMessageDialog(this, "Invalid weight or grade value.");
         }
@@ -310,6 +333,9 @@ public class GradeTrackerUI extends JFrame {
         Assignment toRemove = selected.getAssignments().get(index);
         selected.removeAssignment(toRemove);
         showMessageDialog(this, "Removed assignment: " + toRemove.getName());
+
+        refreshCourseList();
+        updateTermAverageBar();
     }
 
     // MODIFIES: this
@@ -538,6 +564,7 @@ public class GradeTrackerUI extends JFrame {
             refreshTermSelector();
             header.setText("Courses in " + currentTerm.getTermName() + " " + currentTerm.getTermYear());
             refreshCourseList();
+            updateTermAverageBar();
 
             JOptionPane.showMessageDialog(this, "Loaded " + terms.size() + " terms from file.");
         } catch (IOException e) {
@@ -558,7 +585,7 @@ public class GradeTrackerUI extends JFrame {
         }
     }
 
-    // EFFECTS: proompts user and reutrn trimmed non-empty input, or null if cancelled/empty
+    // EFFECTS: prompts user and return trimmed non-empty input, or null if cancelled/empty
     private String promptNonEmpty(String prompt) {
         String value = showInputDialog(this, prompt);
         if (value == null ) {
@@ -590,6 +617,62 @@ public class GradeTrackerUI extends JFrame {
         String title = "Remove Assignment";
         int choice = showOptionDialog(this, msg, title, DEFAULT_OPTION, QUESTION_MESSAGE, null, options, options[0]);
         return choice;
+    }
+
+    // EFFECTS: updates side panel with info about selected course
+    private void updateCourseDetails() {
+        Course selected = courseList.getSelectedValue();
+        if (selected == null) {
+            courseDetails.setText("");
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Course Code: ").append(selected.getCourseCode()).append("\n");
+        sb.append("Credits: ").append(selected.getCredits()).append("\n");
+        sb.append("Type: ").append(selected.checkIsCore() ? "Core" : "Elective").append("\n");
+        
+        double avg = selected.getCourseAverage();
+        String letter = GradeCalculator.convertToLetterGrade(avg);
+        double gpa = GradeCalculator.letterToGPA(letter);
+        sb.append("Average: ").append(fmt(avg)).append("% (").append(letter).append("), GPA: ").append(gpa).append("\n");
+
+        sb.append("Assignments:\n");
+        for (Assignment a : selected.getAssignments()) {
+            sb.append("- ").append(a.getName()).append(": Weight ").append(a.getWeight()).append(", Grade ").append(a.getGrade()).append("%\n");
+        }
+        courseDetails.setText(sb.toString());
+    }
+
+    // MODIFIES: this
+    // EFFECTS: updates progress bar to show current term average
+    private void updateTermAverageBar() {
+        if (termAverageBar == null || currentTerm == null) {
+            return;
+        }
+
+        double avg = computeDisplayedTermAverage(currentTerm);
+        int value = (int) Math.round(avg);
+        termAverageBar.setValue(value);
+        termAverageBar.setString("Term Average: " + fmt(avg) + "%");
+    }
+
+    // EFFECTS: computes the term average based only on courses with at least one assignment
+    private double computeDisplayedTermAverage(Term term) {
+        double totalWeighted = 0.0;
+        double totalCredits = 0.0;
+
+        for (Course c : term.getCourses()) {
+            if (!c.getAssignments().isEmpty()) {
+                totalWeighted += c.getCourseAverage() * c.getCredits();
+                totalCredits += c.getCredits();
+            }
+        }
+
+        if (totalCredits == 0.0) {
+            return 0.0;
+        }
+        return totalWeighted / totalCredits;
     }
 
     // EFFECTS: returns value formatted to 1 decimal place
