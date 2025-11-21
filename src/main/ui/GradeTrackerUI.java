@@ -327,7 +327,7 @@ public class GradeTrackerUI extends JFrame {
     }
 
 
-        // MODIFIES: this
+    // MODIFIES: this
     // EFFECTS: prompts user to remove selected assignment from selected course
     private void handleRemoveAssignment() {
         Course selected = courseList.getSelectedValue();
