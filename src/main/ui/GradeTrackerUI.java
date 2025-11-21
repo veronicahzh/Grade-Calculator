@@ -297,7 +297,7 @@ public class GradeTrackerUI extends JFrame {
         }
     }
 
-    // REQUIRES: the sum of the weights of all assignments in the course does not exceed 1.0
+    // REQUIRES: 0.0 <= grade <= 100.0,  0.0 <= weight <= 1.0
     // MODIFIES: this
     // EFFECTS: prompts user to add a new assignment to selected course
     private void handleAddAssignment() {
@@ -321,7 +321,6 @@ public class GradeTrackerUI extends JFrame {
         } catch (NumberFormatException ex) {
             showMessageDialog(this, "Invalid weight or grade value.");
         }
-
         refreshCourseList();
         updateTermAverageBar();
         updateCourseDetails();

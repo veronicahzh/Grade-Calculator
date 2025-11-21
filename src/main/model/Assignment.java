@@ -8,7 +8,7 @@ import persistence.Writable;
  * Represents a graded component of a course, such as an assignment,
  * quiz, test, or lab. Each assignment has a name, weight, and grade.
  */
-
+// REQUIRES: 0.0 <= weight <= 1.0, 0.0 <= grade <= 100.0
 public class Assignment implements Writable {
     private String name;    // name of the assignment
     private double weight;  // weight of this assignment
