@@ -66,12 +66,11 @@ public class GradeTrackerUI extends JFrame {
         JScrollPane detailsScrollPane = new JScrollPane(courseDetails);
         detailsScrollPane.setBorder(BorderFactory.createTitledBorder("Course Details"));
 
-        // NEW: wrap details + weight total label together
         JPanel detailsPanel = new JPanel(new BorderLayout());
         detailsPanel.add(detailsScrollPane, BorderLayout.CENTER);
 
-        weightTotalLabel = new JLabel("Weight total: —"); // NEW
-        detailsPanel.add(weightTotalLabel, BorderLayout.SOUTH); // NEW
+        weightTotalLabel = new JLabel("Weight total: —");
+        detailsPanel.add(weightTotalLabel, BorderLayout.SOUTH);
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane, detailsPanel);
         splitPane.setResizeWeight(0.5);
@@ -359,7 +358,7 @@ public class GradeTrackerUI extends JFrame {
         for (Course c : currentTerm.getCourses()) {
             courseListModel.addElement(c);
         }
-        updateWeightTotal(); // NEW: keep weight label in sync after list refresh
+        updateWeightTotal();
     }
 
     // MODIFIES: this
@@ -685,7 +684,7 @@ public class GradeTrackerUI extends JFrame {
         }
         courseDetails.setText(sb.toString());
 
-        updateWeightTotal(); // NEW: refresh weight total whenever course details update
+        updateWeightTotal();
     }
 
     // EFFECTS: returns the sum of assignment weights for a course

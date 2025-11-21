@@ -104,4 +104,10 @@ public class TermTest {
         assertEquals(1, t1.getCourses().size());
         assertEquals(c1, t1.getCourses().get(0));
     }
+
+    @Test
+    void testToString() {
+        Term t = new Term("Term 1", 2025);
+        assertEquals("Term 1 (2025)", t.toString());
+    }
 }
