@@ -25,7 +25,7 @@ public class GradeTrackerUI extends JFrame {
     private JComboBox<Term> termSelector;
     private JTextArea courseDetails;
     private JProgressBar termAverageBar;
-
+    private JLabel weightTotalLabel;
     private JLabel header;
     private DefaultListModel<Course> courseListModel;
     private JList<Course> courseList;
@@ -66,7 +66,14 @@ public class GradeTrackerUI extends JFrame {
         JScrollPane detailsScrollPane = new JScrollPane(courseDetails);
         detailsScrollPane.setBorder(BorderFactory.createTitledBorder("Course Details"));
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane, detailsScrollPane);
+        // NEW: wrap details + weight total label together
+        JPanel detailsPanel = new JPanel(new BorderLayout());
+        detailsPanel.add(detailsScrollPane, BorderLayout.CENTER);
+
+        weightTotalLabel = new JLabel("Weight total: —"); // NEW
+        detailsPanel.add(weightTotalLabel, BorderLayout.SOUTH); // NEW
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane, detailsPanel);
         splitPane.setResizeWeight(0.5);
         courseList.addListSelectionListener(e -> updateCourseDetails());
 
@@ -227,6 +234,7 @@ public class GradeTrackerUI extends JFrame {
 
         refreshCourseList();
         updateTermAverageBar();
+        updateWeightTotal();
     }
 
     // MODIFIES: this
@@ -290,6 +298,7 @@ public class GradeTrackerUI extends JFrame {
         }
     }
 
+    // REQUIRES: the sum of the weights of all assignments in the course does not exceed 1.0
     // MODIFIES: this
     // EFFECTS: prompts user to add a new assignment to selected course
     private void handleAddAssignment() {
@@ -313,6 +322,10 @@ public class GradeTrackerUI extends JFrame {
         } catch (NumberFormatException ex) {
             showMessageDialog(this, "Invalid weight or grade value.");
         }
+
+        refreshCourseList();
+        updateTermAverageBar();
+        updateCourseDetails();
     }
 
 
@@ -336,6 +349,7 @@ public class GradeTrackerUI extends JFrame {
 
         refreshCourseList();
         updateTermAverageBar();
+        updateCourseDetails();
     }
 
     // MODIFIES: this
@@ -345,6 +359,7 @@ public class GradeTrackerUI extends JFrame {
         for (Course c : currentTerm.getCourses()) {
             courseListModel.addElement(c);
         }
+        updateWeightTotal(); // NEW: keep weight label in sync after list refresh
     }
 
     // MODIFIES: this
@@ -646,6 +661,7 @@ public class GradeTrackerUI extends JFrame {
         Course selected = courseList.getSelectedValue();
         if (selected == null) {
             courseDetails.setText("");
+            updateWeightTotal(); // ensure label shows '—' when nothing selected
             return;
         }
 
@@ -668,6 +684,32 @@ public class GradeTrackerUI extends JFrame {
             sb.append(line);
         }
         courseDetails.setText(sb.toString());
+
+        updateWeightTotal(); // NEW: refresh weight total whenever course details update
+    }
+
+    // EFFECTS: returns the sum of assignment weights for a course
+    private double sumWeights(Course c) {
+        double sum = 0.0;
+        for (Assignment a : c.getAssignments()) {
+            sum += a.getWeight();
+        }
+        return sum;
+    }
+
+    // MODIFIES: this
+    // EFFECTS: updates the weightTotalLabel for the selected course
+    private void updateWeightTotal() {
+        if (weightTotalLabel == null) {
+            return;
+        }
+        Course selected = courseList.getSelectedValue();
+        if (selected == null) {
+            weightTotalLabel.setText("Weight total: —");
+            return;
+        }
+        double total = sumWeights(selected);
+        weightTotalLabel.setText("Weight total: " + fmt(total) + " / 1.00");
     }
 
 
