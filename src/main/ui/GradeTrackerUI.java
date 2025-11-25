@@ -2,6 +2,8 @@ package ui;
 
 import javax.swing.*;
 import java.awt.BorderLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,6 +13,8 @@ import static javax.swing.JOptionPane.*;
 import ca.ubc.cs.ExcludeFromJacocoGeneratedReport;
 import model.Assignment;
 import model.Course;
+import model.Event;
+import model.EventLog;
 import model.GradeCalculator;
 import model.Term;
 import persistence.JsonReader;
@@ -44,6 +48,14 @@ public class GradeTrackerUI extends JFrame {
 
         initComponents();
         initMenuBar();
+
+        addWindowListener(new WindowAdapter() {
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                printEventLogToConsole();
+            }
+        });
 
         setVisible(true);
     }
@@ -746,6 +758,17 @@ public class GradeTrackerUI extends JFrame {
     private String fmt(double value) {
         return String.format("%.1f", value);
     }
+
+    // EFFECTS: prints all events to console
+    private void printEventLogToConsole() {
+        System.out.println("\n===== Event Log =====");
+        for (Event ev : EventLog.getInstance()) {
+            System.out.println(ev.toString());
+            System.out.println();
+        }
+    }
+
+
 
     // EFFECTS: starts the GradeTracker GUI
     public static void main(String[] args) {

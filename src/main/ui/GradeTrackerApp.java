@@ -86,6 +86,7 @@ public class GradeTrackerApp {
 
     // EFFECTS: prints goodbye and stops the app
     private boolean quit() {
+        printEventLogToConsole();
         System.out.println("Goodbye!");
         return false;
     }
@@ -558,5 +559,14 @@ public class GradeTrackerApp {
         }
         System.out.print("Loaded " + termCount + " term(s), ");
         System.out.print(courseCount + " course(s), " + assignmentCount + " assignment(s).");
+    }
+
+    // EFFECTS: prints all events to console
+    private void printEventLogToConsole() {
+        System.out.println("\n===== Event Log =====");
+        for (Event ev : EventLog.getInstance()) {
+            System.out.println(ev.toString());
+            System.out.println();
+        }
     }
 }

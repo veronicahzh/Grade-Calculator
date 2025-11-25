@@ -30,12 +30,18 @@ public class Term implements Writable {
     // EFFECTS: adds the course c to the list of courses for this term
     public void addCourse(Course c) {
         courses.add(c);
+        EventLog log = EventLog.getInstance();
+        String msg = "Course added: " + c.getCourseCode() + " to " + termName + " (" + year + ")";
+        log.logEvent(new Event(msg));
     }
 
     // MODIFIES: this
     // EFFECTS: removes the course c from the list of courses for this term
     public void removeCourse(Course c) {
         courses.remove(c);
+        EventLog log = EventLog.getInstance();
+        String msg = "Course removed: " + c.getCourseCode() + " from " + termName + " (" + year + ")";
+        log.logEvent(new Event(msg));
     }
 
     // EFFECTS: returns the name of this term

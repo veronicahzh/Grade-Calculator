@@ -34,12 +34,19 @@ public class Course implements Writable {
     // EFFECTS: adds the assignment a to the list of assignments for this course
     public void addAssignment(Assignment a) {
         assignments.add(a);
+        EventLog log = EventLog.getInstance();
+        String msg = "Assignment added: " + a.getName() + " to "; 
+        msg += courseCode + " (weight = " + a.getWeight() + ", grade = " + a.getGrade() + ")";
+        log.logEvent(new Event(msg));
     }
 
     // MODIIFES: this
     // EFFECTS: removes the assignment a from the list of assignments for this course
     public void removeAssignment(Assignment a) {
         assignments.remove(a);
+        EventLog log = EventLog.getInstance();
+        String msg = "Assignment removed: " + a.getName() + " from " + courseCode;
+        log.logEvent(new Event(msg));
     }
 
     // EFFECTS: returns the course code of this course

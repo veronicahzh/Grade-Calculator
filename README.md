@@ -51,3 +51,15 @@ As a user, I want to have the option to load a previously saved grade tracker fi
 - You can save the state of my application by going to the menu bar at the top, clicking **"File"**, and then selecting **"Save"**. This writes all of your terms, courses, and assignments to `./data/my-grade-tracker.json`.
 
 - You can reload the state of my application by going to the menu bar at the top, clicking **"File"**, and then selecting **"Load"**. This reads your previously saved terms, courses, and assignments from `./data/my-grade-tracker.json` and repopulates the GUI.
+
+## Phase 4: Task 2
+
+===== Event Log =====
+Mon Nov 24 20:51:12 PST 2025
+Course added: CPSC110 to Term 1 (2025)
+
+Mon Nov 24 20:51:22 PST 2025
+Assignment added: HW1 to CPSC110 (weight = 0.10, grade = 95.0)
+
+Mon Nov 24 20:51:35 PST 2025
+Assignment removed: HW1 from CPSC110
