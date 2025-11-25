@@ -1,64 +1,21 @@
-{"terms": [
-  {
-    "courses": [
+{"terms": [{
+  "courses": [{
+    "assignments": [
       {
-        "assignments": [
-          {
-            "grade": 97.6,
-            "name": "final",
-            "weight": 0.5
-          },
-          {
-            "grade": 42.4,
-            "name": "hw",
-            "weight": 0.3
-          }
-        ],
-        "credits": 4,
-        "courseCode": "CPSC_210",
-        "isCore": true
+        "grade": 75.8,
+        "name": "mt",
+        "weight": 0.3
       },
       {
-        "assignments": [{
-          "grade": 75.8,
-          "name": "midterm",
-          "weight": 0.4
-        }],
-        "credits": 3,
-        "courseCode": "ECON_101",
-        "isCore": false
+        "grade": 59.7,
+        "name": "finak",
+        "weight": 0.7
       }
     ],
-    "year": 2025,
-    "termName": "Term 1"
-  },
-  {
-    "courses": [
-      {
-        "assignments": [
-          {
-            "grade": 50,
-            "name": "final",
-            "weight": 0.5
-          },
-          {
-            "grade": 100,
-            "name": "webwork",
-            "weight": 0.1
-          }
-        ],
-        "credits": 3,
-        "courseCode": "MATH_100",
-        "isCore": true
-      },
-      {
-        "assignments": [],
-        "credits": 3,
-        "courseCode": "MATH_101",
-        "isCore": true
-      }
-    ],
-    "year": 2024,
-    "termName": "Term 2"
-  }
-]}
+    "credits": 4,
+    "courseCode": "cpsc_210",
+    "isCore": true
+  }],
+  "year": 2025,
+  "termName": "Term 1"
+}]}
