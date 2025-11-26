@@ -64,3 +64,7 @@ Assignment added: HW1 to CPSC110 (weight = 0.10, grade = 95.0)
 
 Mon Nov 24 20:51:35 PST 2025
 Assignment removed: HW1 from CPSC110
+
+## Phase 4: Task 3
+
+If I had more time, I would tighten separation of concerns by adding an application-service layer (e.g., `GradeTrackerService`) that owns operations like adding/removing courses and assignments, computing averages, and coordinating persistence. Both UIs (`GradeTrackerUI` and `GradeTrackerApp`) would call this service instead of touching model lists directly. I’d also add a simple observer/listener pattern in the model so the UI can subscribe to changes (e.g., “course added,” “assignment removed”) rather than manually refreshing after every action. This keeps responsibilities clearer, reduces coupling between UI and model, and makes the core behavior easier to unit test without a UI.
