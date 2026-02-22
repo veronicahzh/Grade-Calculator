@@ -2,23 +2,24 @@ package network;
 
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 
-public class UbcGradesClient {
+public class UBCGradesClient {
 
     private final HttpClient client;
     private final String baseUrl;
 
-    public UbcGradesClient(String baseUrl) {
+    public UBCGradesClient(String baseUrl) {
         this.baseUrl = stripTrailingSlash(baseUrl);
         client = HttpClient.newBuilder().build();
     }
 
-    public JSONObject getJson(String path) throws IOException {
+    public JSONObject getJson(String path) throws IOException, InterruptedException {
         String url = baseUrl + ensureLeadingSlash(path);
 
         HttpRequest req = HttpRequest.newBuilder()
